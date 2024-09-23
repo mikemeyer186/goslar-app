@@ -60,10 +60,12 @@ button:focus-visible {
     flex-wrap: wrap;
     justify-content: center;
     width: 90vw;
+    transition: all 225ms ease-in-out;
+    gap: 8px;
 }
 
 .station {
-    width: 200px;
+    width: 100%;
     border-radius: 8px;
     padding: 16px;
     border: 1px solid rgba(101, 101, 101, 0.496);
