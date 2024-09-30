@@ -25,7 +25,7 @@ exports.fetchFuelPrices = functions
                 },
             });
             const stations = response.data.stations;
-            const timestamp = admin.firestore.FieldValue.serverTimestamp();
+            const timestamp = new Date();
             const currentDocRef = db.collection('fuel_prices').doc('current');
             const dataToStore = {
                 updated: timestamp,

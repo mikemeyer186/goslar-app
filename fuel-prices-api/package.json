@@ -1,0 +1,16 @@
+{
+    "name": "fuel-prices-api",
+    "version": "1.0.0",
+    "description": "Fuel prices API",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "cors": "^2.8.5",
+        "express": "^4.21.0",
+        "firebase-admin": "^12.5.0"
+    }
+}
