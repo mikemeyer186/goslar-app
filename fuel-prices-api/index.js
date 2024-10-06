@@ -49,7 +49,7 @@ app.use(authenticateApiKey);
 // Endpoint: /
 app.get('/', async (req, res) => {
     try {
-        const data = 'Please request "/cheapest", "/current" or "/historic" to get fuel prices.';
+        const data = 'Please request "/cheapest", "/all" or "/historic" to get fuel prices.';
         return res.status(200).json(data);
     } catch (error) {
         console.error('Error while requesting fuel prices:', error);
@@ -57,20 +57,20 @@ app.get('/', async (req, res) => {
     }
 });
 
-// Endpoint: /current
-app.get('/current', async (req, res) => {
+// Endpoint: /all
+app.get('/all', async (req, res) => {
     try {
-        const currentDocRef = db.collection('fuel_prices').doc('current');
+        const currentDocRef = db.collection('fuel_prices').doc('all');
         const doc = await currentDocRef.get();
 
         if (!doc.exists) {
-            return res.status(404).json({ error: 'No current fuel prices found!' });
+            return res.status(404).json({ error: 'No fuel prices found!' });
         }
 
         const data = doc.data();
         return res.status(200).json(data);
     } catch (error) {
-        console.error('Error while requesting current fuel prices:', error);
+        console.error('Error while requesting fuel prices:', error);
         res.status(500).json({ error: 'Internal server error.' });
     }
 });
@@ -78,18 +78,18 @@ app.get('/current', async (req, res) => {
 // Endpoint: /cheapest
 app.get('/cheapest', async (req, res) => {
     try {
-        const snapshot = await db.collection('fuel_prices').orderBy('price').limit(1).get();
-        if (snapshot.empty) {
-            return res.status(404).json({ error: 'Keine Spritpreise gefunden.' });
+        const currentDocRef = db.collection('fuel_prices').doc('cheapest');
+        const doc = await currentDocRef.get();
+
+        if (!doc.exists) {
+            return res.status(404).json({ error: 'No fuel prices found!' });
         }
-        const data = [];
-        snapshot.forEach((doc) => {
-            data.push({ id: doc.id, ...doc.data() });
-        });
-        res.status(200).json(data[0]);
+
+        const data = doc.data();
+        return res.status(200).json(data);
     } catch (error) {
-        console.error('Fehler beim Abrufen der günstigsten Spritpreise:', error);
-        res.status(500).json({ error: 'Interner Serverfehler.' });
+        console.error('Error while requesting fuel prices:', error);
+        res.status(500).json({ error: 'Internal server error.' });
     }
 });
 

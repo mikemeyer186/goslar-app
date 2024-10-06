@@ -29,3 +29,7 @@ dist-ssr
 
 # Cloud
 deploy.sh
+setRuntimeConfig.sh
+.firebaserc
+
+tile.json
