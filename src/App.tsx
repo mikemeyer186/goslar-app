@@ -1,76 +1,56 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { loadCurrentFuelPrices } from './services/firebase';
 import Station from './interfaces/station';
-import './App.css';
+import TileStation from './components/stationTile';
+import Navbar from './components/navbar';
+import Toolbar from './components/toolbar';
 
-function App() {
-    const [containerOutput, setContainerOutput] = useState<Station[]>([]);
-    const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
-    const apiUrl = import.meta.env.VITE_CONTAINER_URL;
-    const apiKey = import.meta.env.VITE_CONTAINER_API_KEY;
+export default function App() {
+    const [fuelStations, setFuelStations] = useState<Station[]>([]);
+    const [lastUpdate, setLastUpdate] = useState<string>('');
+    const didInit = useRef(false);
+    const [isLoaded, setIsLoaded] = useState(false);
 
-    async function requestStations(range: string) {
-        try {
-            const response = await fetch(apiUrl + range, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': apiKey,
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const stations = await response.json();
-
-            if (range === 'cheapest') {
-                const stationsArray: Station[] = Object.values(stations.data);
-                setContainerOutput(stationsArray);
-            } else {
-                setContainerOutput(stations.data);
-            }
-
-            setLastUpdate(new Date(stations.updated._seconds * 1000));
-        } catch (error) {
-            console.error('Fehler beim Abrufen der Spritpreise:', error);
-        }
-    }
-
-    return (
-        <>
-            <button onClick={() => requestStations('all')}>Alle Tankstellen</button>
-            <button onClick={() => requestStations('cheapest')}>Günstigste Tankstellen</button>
-
-            <p>Letzte Aktualisierung:</p>
-            {lastUpdate.toLocaleDateString('de-DE', {
+    async function loadPrices() {
+        const stationsData = await loadCurrentFuelPrices();
+        setFuelStations(stationsData?.data);
+        setLastUpdate(
+            new Date(stationsData?.updated.seconds * 1000).toLocaleDateString('de-DE', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit',
-            })}
+            })
+        );
+        setIsLoaded(true);
+        console.log(stationsData);
+    }
 
-            <div className="stations-container">
-                {containerOutput.map((station, index) => {
-                    return (
-                        <div className="station" key={index}>
-                            <div>
-                                <strong>{station.brand}</strong>
-                            </div>
-                            <div>
-                                {station.street} {station.houseNumber}
-                            </div>
-                            <div>{station.place}</div>
-                            <div>Diesel: {station.diesel}</div>
-                            <div>E5: {station.e5}</div>
-                            <div>E10: {station.e10}</div>
-                        </div>
-                    );
-                })}
-            </div>
-        </>
+    useEffect(() => {
+        if (!didInit.current) {
+            loadPrices();
+            didInit.current = true;
+        }
+    }, []);
+
+    return (
+        <main>
+            <Navbar></Navbar>
+
+            <Toolbar></Toolbar>
+
+            <section className="station-container">
+                {isLoaded ? (
+                    <>
+                        {fuelStations.map((station: Station) => {
+                            return <TileStation key={station.id} station={station} updated={lastUpdate} />;
+                        })}
+                    </>
+                ) : (
+                    <div>Tankstellen werden geladen...</div>
+                )}
+            </section>
+        </main>
     );
 }
-
-export default App;

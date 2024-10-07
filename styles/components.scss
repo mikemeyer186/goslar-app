@@ -1,0 +1,41 @@
+@import 'variables.scss';
+
+.navbar {
+    height: $height-navbar;
+    border-bottom: $border-thin;
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: $bg-color-main;
+    padding: 8px;
+
+    .navbar-title {
+        width: 100%;
+        text-align: center;
+        font-weight: 400;
+        font-size: 1.1rem;
+    }
+
+    .navbar-icon {
+        position: absolute;
+        top: 25%;
+        right: 8px;
+        cursor: pointer;
+    }
+}
+
+.toolbar {
+    height: 100px;
+    width: 100%;
+}
+
+.station-tile {
+    box-shadow: $shadow-tile;
+    border-radius: $radius-tile;
+    padding: 16px;
+    width: 100%;
+}
