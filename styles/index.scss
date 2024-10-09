@@ -23,14 +23,5 @@ main {
     width: 100svw;
     display: flex;
     flex-direction: column;
-    gap: 16px;
     padding-top: $height-navbar;
-
-    .station-container {
-        padding: $padding-normal;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        width: 100%;
-    }
 }

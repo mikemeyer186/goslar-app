@@ -8,8 +8,11 @@ import Toolbar from './components/toolbar';
 export default function App() {
     const [fuelStations, setFuelStations] = useState<Station[]>([]);
     const [lastUpdate, setLastUpdate] = useState<string>('');
-    const didInit = useRef(false);
     const [isLoaded, setIsLoaded] = useState(false);
+    const [activeSelection, setActiveSelection] = useState<FuelSelection>('diesel');
+    const didInit = useRef(false);
+    let sortedFuelStations: Station[] = [];
+    type FuelSelection = 'e5' | 'e10' | 'diesel';
 
     async function loadPrices() {
         const stationsData = await loadCurrentFuelPrices();
@@ -27,6 +30,10 @@ export default function App() {
         console.log(stationsData);
     }
 
+    function onFuelSelection(selection: FuelSelection) {
+        setActiveSelection(selection);
+    }
+
     useEffect(() => {
         if (!didInit.current) {
             loadPrices();
@@ -34,17 +41,22 @@ export default function App() {
         }
     }, []);
 
+    sortedFuelStations = fuelStations
+        .slice()
+        .sort((a: Station, b: Station) => a[activeSelection] - b[activeSelection])
+        .filter((station: Station) => station[activeSelection] > 0);
+
     return (
         <main>
             <Navbar></Navbar>
 
-            <Toolbar></Toolbar>
+            <Toolbar onFuelSelection={onFuelSelection} activeSelection={activeSelection}></Toolbar>
 
             <section className="station-container">
                 {isLoaded ? (
                     <>
-                        {fuelStations.map((station: Station) => {
-                            return <TileStation key={station.id} station={station} updated={lastUpdate} />;
+                        {sortedFuelStations.map((station: Station) => {
+                            return <TileStation key={station.id} station={station} updated={lastUpdate} activeSelection={activeSelection} />;
                         })}
                     </>
                 ) : (

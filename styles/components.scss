@@ -12,6 +12,7 @@
     right: 0;
     background-color: $bg-color-main;
     padding: 8px;
+    z-index: 2;
 
     .navbar-title {
         width: 100%;
@@ -29,13 +30,137 @@
 }
 
 .toolbar {
-    height: 100px;
+    height: 44px;
     width: 100%;
+    padding: 16px 16px 0;
+    display: flex;
+    gap: 8px;
+
+    .btn-selection {
+        height: 28px;
+        border-radius: $radius-btn;
+        padding: 4px 16px;
+        border: $border-button;
+        background-color: $bg-color-main;
+        color: $txt-color-btn;
+        transition: $transition-normal;
+
+        &:hover {
+            cursor: pointer;
+            background-color: $bg-btn-hover;
+        }
+    }
+
+    .btn-active {
+        background-color: $bg-btn-active;
+        color: $txt-color-btn-active;
+
+        &:hover {
+            background-color: $bg-btn-active;
+            color: $txt-color-btn-active;
+        }
+    }
 }
 
-.station-tile {
-    box-shadow: $shadow-tile;
-    border-radius: $radius-tile;
-    padding: 16px;
+.station-container {
+    padding: $padding-normal;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     width: 100%;
+
+    .station-tile {
+        position: relative;
+        box-shadow: $shadow-tile;
+        border-radius: $radius-tile;
+        padding: 16px;
+        width: 100%;
+        height: 85px;
+        transition: $transition-normal;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        cursor: pointer;
+
+        .station-small-content {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+
+            .station-left {
+                .station-brand {
+                    font-weight: 600;
+                }
+
+                .station-adress {
+                    font-weight: 400;
+                    font-size: 0.9rem;
+                }
+            }
+
+            .station-right {
+                font-size: 1.7rem;
+                font-weight: 700;
+            }
+        }
+
+        .station-large-content {
+            transition: $transition-normal;
+            opacity: 0;
+            padding-top: 16px;
+            line-height: 1.5;
+            font-size: 1.1rem;
+
+            .station-table-price {
+                padding-left: 16px;
+                font-weight: 500;
+            }
+
+            .station-updated {
+                padding-top: 8px;
+                font-weight: 300;
+                font-size: 0.8rem;
+            }
+        }
+
+        .station-large-visible {
+            opacity: 1;
+        }
+    }
+
+    .station-large {
+        height: 248px;
+    }
+
+    .station-status {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 8px;
+        height: 8px;
+        border-radius: 100%;
+    }
+
+    .station-open {
+        background-color: $bg-green;
+    }
+
+    .station-closed {
+        background-color: $bg-red;
+    }
+
+    .station-large-status {
+        padding-top: 8px;
+        font-weight: 300;
+        font-size: 0.8rem;
+    }
+
+    .station-large-open {
+        color: $bg-green;
+    }
+
+    .station-large-closed {
+        color: $bg-red;
+    }
 }
