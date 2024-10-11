@@ -7,6 +7,8 @@ $bg-btn-active: #3f3f3e;
 $bg-btn-hover: #f5f5f5;
 $bg-red: #d6271b;
 $bg-green: #477a47;
+$bg-slider-active: #34c759;
+$bg-slider-inactive: #c6c6c8;
 
 // paddings, margings and gaps
 $padding-normal: 16px;
@@ -15,13 +17,14 @@ $border-button: 1px solid #3f3f3e;
 
 // shadows
 $shadow-tile: 0 2px 4px 0 rgb(0, 0, 0, 0.02), 0 4px 8px 0 rgb(0, 0, 0, 0.04), 0 8px 32px 0 rgb(0, 0, 0, 0.08);
+$shadow-knob: 0 3px 1px 0 rgb(0, 0, 0, 0.06), 0 3px 8px 0 rgb(0, 0, 0, 0.15), 0 0 0 1px rgb(0, 0, 0, 0.04);
 
 // borders
 $radius-tile: 24px;
 $radius-btn: 100px;
 
 //dimensions
-$height-navbar: 44px;
+$height-navbar: 0px;
 
 //animations
 $transition-normal: all 225ms ease-in-out;

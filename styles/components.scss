@@ -30,20 +30,22 @@
 }
 
 .toolbar {
-    height: 44px;
     width: 100%;
     padding: 16px 16px 0;
     display: flex;
-    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
 
     .btn-selection {
-        height: 28px;
+        height: 31px;
+        font-size: 1rem;
         border-radius: $radius-btn;
         padding: 4px 16px;
         border: $border-button;
         background-color: $bg-color-main;
         color: $txt-color-btn;
         transition: $transition-normal;
+        margin-right: 8px;
 
         &:hover {
             cursor: pointer;
@@ -58,6 +60,41 @@
         &:hover {
             background-color: $bg-btn-active;
             color: $txt-color-btn-active;
+        }
+    }
+
+    .toolbar-slider-label {
+        font-size: 0.7rem;
+    }
+
+    .toolbar-slider-toggle {
+        width: 51px;
+        height: 31px;
+        padding: 2px;
+        border-radius: 100px;
+        background-color: $bg-slider-active;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        cursor: pointer;
+
+        .toolbar-slider-knob {
+            width: 27px;
+            height: 27px;
+            background-color: $bg-color-main;
+            border-radius: 100px;
+            box-shadow: $shadow-knob;
+            transform: translateX(20px);
+            transition: $transition-normal;
+        }
+    }
+
+    .slider-inactive {
+        background-color: $bg-slider-inactive;
+
+        .toolbar-slider-knob {
+            transform: translateX(0);
         }
     }
 }

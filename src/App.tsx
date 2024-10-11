@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { loadCurrentFuelPrices } from './services/firebase';
 import Station from './interfaces/station';
 import TileStation from './components/stationTile';
-import Navbar from './components/navbar';
 import Toolbar from './components/toolbar';
 
 export default function App() {
@@ -10,8 +9,10 @@ export default function App() {
     const [lastUpdate, setLastUpdate] = useState<string>('');
     const [isLoaded, setIsLoaded] = useState(false);
     const [activeSelection, setActiveSelection] = useState<FuelSelection>('diesel');
+    const [showOnlyOpenStations, setShowOnlyOpenStations] = useState(true);
     const didInit = useRef(false);
     let sortedFuelStations: Station[] = [];
+    let filteredFuelStations: Station[] = [];
     type FuelSelection = 'e5' | 'e10' | 'diesel';
 
     async function loadPrices() {
@@ -34,6 +35,14 @@ export default function App() {
         setActiveSelection(selection);
     }
 
+    function onSliderMove() {
+        if (showOnlyOpenStations) {
+            setShowOnlyOpenStations(false);
+        } else {
+            setShowOnlyOpenStations(true);
+        }
+    }
+
     useEffect(() => {
         if (!didInit.current) {
             loadPrices();
@@ -46,16 +55,25 @@ export default function App() {
         .sort((a: Station, b: Station) => a[activeSelection] - b[activeSelection])
         .filter((station: Station) => station[activeSelection] > 0);
 
+    if (showOnlyOpenStations) {
+        filteredFuelStations = sortedFuelStations.filter((station: Station) => station.isOpen);
+    } else {
+        filteredFuelStations = sortedFuelStations;
+    }
+
     return (
         <main>
-            <Navbar></Navbar>
-
-            <Toolbar onFuelSelection={onFuelSelection} activeSelection={activeSelection}></Toolbar>
+            <Toolbar
+                onFuelSelection={onFuelSelection}
+                activeSelection={activeSelection}
+                onSliderMove={onSliderMove}
+                showOnlyOpenStations={showOnlyOpenStations}
+            ></Toolbar>
 
             <section className="station-container">
                 {isLoaded ? (
                     <>
-                        {sortedFuelStations.map((station: Station) => {
+                        {filteredFuelStations.map((station: Station) => {
                             return <TileStation key={station.id} station={station} updated={lastUpdate} activeSelection={activeSelection} />;
                         })}
                     </>
