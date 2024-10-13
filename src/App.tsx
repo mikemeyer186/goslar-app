@@ -4,6 +4,7 @@ import Station from './interfaces/station';
 import TileStation from './components/stationTile';
 import Toolbar from './components/toolbar';
 import Spinner from './components/spinner';
+import Footer from './components/footer';
 
 export default function App() {
     const [fuelStations, setFuelStations] = useState<Station[]>([]);
@@ -65,19 +66,21 @@ export default function App() {
 
     return (
         <main>
-            <Toolbar
-                onFuelSelection={onFuelSelection}
-                activeSelection={activeSelection}
-                onSliderMove={onSliderMove}
-                showOnlyOpenStations={showOnlyOpenStations}
-            ></Toolbar>
-
             <section className="station-container">
                 {isLoaded ? (
                     <>
+                        <Toolbar
+                            onFuelSelection={onFuelSelection}
+                            activeSelection={activeSelection}
+                            onSliderMove={onSliderMove}
+                            showOnlyOpenStations={showOnlyOpenStations}
+                        ></Toolbar>
+
                         {filteredFuelStations.map((station: Station) => {
                             return <TileStation key={station.id} station={station} updated={lastUpdate} activeSelection={activeSelection} />;
                         })}
+
+                        <Footer />
                     </>
                 ) : (
                     <Spinner />

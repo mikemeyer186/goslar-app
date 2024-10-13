@@ -239,6 +239,29 @@
     }
 }
 
+.footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 0;
+
+    .footer-disclaimer {
+        text-align: center;
+        font-size: 0.7rem;
+
+        a {
+            color: $txt-color-link;
+        }
+    }
+
+    .footer-links {
+        text-align: center;
+        font-size: 0.8rem;
+    }
+}
+
 //animations
 @keyframes rotate {
     0% {
