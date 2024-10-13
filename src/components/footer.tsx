@@ -1,8 +1,14 @@
-export default function Footer() {
+interface StationTileProps {
+    updated: string;
+}
+
+export default function Footer({ updated }: StationTileProps) {
     return (
         <section className="footer">
+            <div className="footer-updated">Letztes Preisupdate: {updated} Uhr</div>
+
             <div className="footer-disclaimer">
-                <span>Bereitstellung der Preise duch </span>
+                <span>Bereitstellung der Preise duch: </span>
                 <a href="https://creativecommons.tankerkoenig.de/">www.creativecommons.tankerkoenig.de</a>
             </div>
 
@@ -12,9 +18,7 @@ export default function Footer() {
                 <span>Datenschutz</span>
             </div>
 
-            <div className="footer-links">
-                <span>© 2024</span>
-            </div>
+            <span>© 2024</span>
         </section>
     );
 }

@@ -77,10 +77,10 @@ export default function App() {
                         ></Toolbar>
 
                         {filteredFuelStations.map((station: Station) => {
-                            return <TileStation key={station.id} station={station} updated={lastUpdate} activeSelection={activeSelection} />;
+                            return <TileStation key={station.id} station={station} activeSelection={activeSelection} />;
                         })}
 
-                        <Footer />
+                        <Footer updated={lastUpdate} />
                     </>
                 ) : (
                     <Spinner />

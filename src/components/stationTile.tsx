@@ -3,11 +3,10 @@ import Station from '../interfaces/station';
 
 interface StationTileProps {
     station: Station;
-    updated: string;
     activeSelection: string;
 }
 
-export default function StationTile({ station, updated, activeSelection }: StationTileProps) {
+export default function StationTile({ station, activeSelection }: StationTileProps) {
     const [stationClicked, setStationClicked] = useState(false);
 
     function onStationClick() {
@@ -20,7 +19,6 @@ export default function StationTile({ station, updated, activeSelection }: Stati
 
     return (
         <section className={`station-tile ${stationClicked ? 'station-large' : ''}`} onClick={onStationClick}>
-            <div className={`station-status ${station.isOpen ? 'station-open' : 'station-closed'}`}></div>
             <div className="station-small-content">
                 <div className="station-left">
                     <span className="station-brand">{station.brand}</span>
@@ -46,7 +44,11 @@ export default function StationTile({ station, updated, activeSelection }: Stati
             </div>
 
             <div className={`station-large-content ${stationClicked ? 'station-large-visible' : ''}`}>
-                <table>
+                <div className={`station-large-status ${station.isOpen ? 'station-large-open' : 'station-large-closed'}`}>
+                    {station.isOpen ? 'Die Tankstelle hat geöffnet' : 'Die Tankstelle hat zur Zeit geschlossen'}
+                </div>
+
+                <table className="station-table">
                     <tbody>
                         <tr>
                             <td>Diesel:</td>
@@ -62,10 +64,6 @@ export default function StationTile({ station, updated, activeSelection }: Stati
                         </tr>
                     </tbody>
                 </table>
-                <div className={`station-large-status ${station.isOpen ? 'station-large-open' : 'station-large-closed'}`}>
-                    {station.isOpen ? 'Die Tankstelle hat geöffnet' : 'Die Tankstelle hat geschlossen'}
-                </div>
-                <div className="station-updated">Letztes Preisupdate: {updated}</div>
             </div>
         </section>
     );

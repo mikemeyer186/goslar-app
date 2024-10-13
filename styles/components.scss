@@ -143,7 +143,6 @@
 }
 
 .station-container {
-    padding: $padding-normal;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -188,19 +187,22 @@
         .station-large-content {
             transition: $transition-normal;
             opacity: 0;
-            padding-top: 16px;
-            line-height: 1.5;
-            font-size: 1.1rem;
+            padding-top: 8px;
 
-            .station-table-price {
-                padding-left: 16px;
-                font-weight: 500;
-            }
+            .station-table {
+                padding-top: 16px;
+                border-spacing: 0;
+                line-height: 1.5;
+                font-size: 1.2rem;
 
-            .station-updated {
-                padding-top: 8px;
-                font-weight: 300;
-                font-size: 0.8rem;
+                td {
+                    padding: 0;
+                }
+
+                .station-table-price {
+                    padding-left: 16px;
+                    font-weight: 500;
+                }
             }
         }
 
@@ -210,7 +212,7 @@
     }
 
     .station-large {
-        height: 248px;
+        height: 210px;
     }
 
     .station-status {
@@ -231,7 +233,6 @@
     }
 
     .station-large-status {
-        padding-top: 8px;
         font-weight: 300;
         font-size: 0.8rem;
     }
@@ -252,19 +253,21 @@
     align-items: center;
     gap: 16px;
     padding: 16px 0;
+    font-size: 0.8rem;
+    text-align: center;
+    width: 100%;
+
+    .footer-updated {
+        font-size: 0.7rem;
+    }
 
     .footer-disclaimer {
-        text-align: center;
         font-size: 0.7rem;
+        margin-bottom: 16px;
 
         a {
             color: $txt-color-link;
         }
-    }
-
-    .footer-links {
-        text-align: center;
-        font-size: 0.8rem;
     }
 }
 
