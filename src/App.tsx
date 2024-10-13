@@ -12,12 +12,15 @@ export default function App() {
     const [isLoaded, setIsLoaded] = useState(false);
     const [activeSelection, setActiveSelection] = useState<FuelSelection>('diesel');
     const [showOnlyOpenStations, setShowOnlyOpenStations] = useState(true);
+    const [selectedCities, setSelectedCities] = useState<string[]>([]);
+    const [isFiltered, setIsFiltered] = useState<boolean>(false);
     const didInit = useRef(false);
     let sortedFuelStations: Station[] = [];
+    let openStations: Station[] = [];
     let filteredFuelStations: Station[] = [];
     type FuelSelection = 'e5' | 'e10' | 'diesel';
 
-    async function loadPrices() {
+    async function handlePriceLoading() {
         const stationsData = await loadCurrentFuelPrices();
         setFuelStations(stationsData?.data);
         setLastUpdate(
@@ -48,20 +51,37 @@ export default function App() {
 
     useEffect(() => {
         if (!didInit.current) {
-            loadPrices();
+            handlePriceLoading();
             didInit.current = true;
         }
     }, []);
 
+    useEffect(() => {
+        if (selectedCities.length > 0) {
+            setIsFiltered(true);
+        } else {
+            setIsFiltered(false);
+        }
+    }, [selectedCities]);
+
+    // sorting of stations by pice (selected fuel button)
     sortedFuelStations = fuelStations
         .slice()
         .sort((a: Station, b: Station) => a[activeSelection] - b[activeSelection])
         .filter((station: Station) => station[activeSelection] > 0);
 
+    // filters only open stations (toggle)
     if (showOnlyOpenStations) {
-        filteredFuelStations = sortedFuelStations.filter((station: Station) => station.isOpen);
+        openStations = sortedFuelStations.filter((station: Station) => station.isOpen);
     } else {
-        filteredFuelStations = sortedFuelStations;
+        openStations = sortedFuelStations;
+    }
+
+    // filters selected stations by cities (filter menu)
+    if (isFiltered) {
+        filteredFuelStations = openStations.filter((station: Station) => selectedCities.includes(station.place));
+    } else {
+        filteredFuelStations = openStations;
     }
 
     return (
@@ -74,6 +94,10 @@ export default function App() {
                             activeSelection={activeSelection}
                             onSliderMove={onSliderMove}
                             showOnlyOpenStations={showOnlyOpenStations}
+                            openStations={openStations}
+                            selectedCities={selectedCities}
+                            setSelectedCities={setSelectedCities}
+                            isFiltered={isFiltered}
                         ></Toolbar>
 
                         {filteredFuelStations.map((station: Station) => {

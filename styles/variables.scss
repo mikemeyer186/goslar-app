@@ -5,13 +5,15 @@ $txt-color-btn-active: #f5f5f5;
 $txt-color-link: #4e69c4;
 $bg-color-main: #ffffff;
 $bg-btn-active: #3f3f3e;
+$bg-btn-yellow: #fcce4c;
 $bg-btn-hover: #f5f5f5;
 $bg-red: #d6271b;
 $bg-green: #477a47;
 $bg-slider-active: #74c774;
-$bg-slider-inactive: rgba(127, 127, 127, 0.32);
+$bg-slider-inactive: #7f7f7f52;
 $bg-spinner-dark: #3f3f3e;
 $bg-spinner-light: #fcce4c;
+$bg-backdrop: rgba(63, 63, 62, 0.2);
 
 // paddings, margings and gaps
 $padding-normal: 16px;
@@ -20,6 +22,7 @@ $border-button: 1px solid #3f3f3e;
 
 // shadows
 $shadow-tile: 0 2px 4px 0 rgb(0, 0, 0, 0.02), 0 4px 8px 0 rgb(0, 0, 0, 0.04), 0 8px 32px 0 rgb(0, 0, 0, 0.08);
+$shadow-filter-menu: 0 2px 4px 0 rgb(0, 0, 0, 0.02), 0 4px 8px 0 rgb(0, 0, 0, 0.04), 0 8px 32px 0 rgb(0, 0, 0, 0.2);
 $shadow-knob: 0 3px 1px 0 rgb(0, 0, 0, 0.06), 0 3px 8px 0 rgb(0, 0, 0, 0.15), 0 0 0 1px rgb(0, 0, 0, 0.04);
 
 // borders
@@ -31,3 +34,5 @@ $height-navbar: 0px;
 
 //animations
 $transition-normal: all 225ms ease-in-out;
+$transition-backdrop: all 225ms ease-out;
+$transition-short: all 200ms ease-out;

@@ -72,7 +72,12 @@
     flex-direction: column;
 
     .toolbar-filter {
+        position: relative;
         padding: 16px 0 0;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
 
         .btn-selection {
             height: 36px;
@@ -96,6 +101,67 @@
                 background-color: $bg-btn-active;
                 color: $txt-color-btn-active;
             }
+        }
+
+        .btn-filter {
+            background-color: $bg-color-main;
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            margin: 0;
+            border: none;
+            border-radius: $radius-btn;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            filter: invert(0);
+            transition: $transition-normal;
+
+            img {
+                transform: translateX(-0.4px);
+                width: 100%;
+                object-fit: cover;
+            }
+
+            .filter-active {
+                filter: invert(1);
+            }
+        }
+
+        .filter-menu {
+            position: absolute;
+            right: 0;
+            top: 53px;
+            min-width: 260px;
+            min-height: 0;
+            background-color: $bg-color-main;
+            box-shadow: $shadow-filter-menu;
+            border-radius: $radius-tile;
+            padding: 16px;
+            transition: $transition-short;
+            z-index: -1;
+            opacity: 0;
+
+            .filter-menu-list {
+                font-size: 1.1rem;
+                line-height: 1.7;
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-start;
+                gap: 8px;
+
+                input {
+                    width: 20px;
+                    height: 20px;
+                    cursor: pointer;
+                }
+            }
+        }
+
+        .filter-menu-active {
+            z-index: 3;
+            opacity: 1;
         }
     }
 
