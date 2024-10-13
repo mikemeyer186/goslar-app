@@ -3,6 +3,7 @@ import { loadCurrentFuelPrices } from './services/firebase';
 import Station from './interfaces/station';
 import TileStation from './components/stationTile';
 import Toolbar from './components/toolbar';
+import Spinner from './components/spinner';
 
 export default function App() {
     const [fuelStations, setFuelStations] = useState<Station[]>([]);
@@ -27,8 +28,9 @@ export default function App() {
                 minute: '2-digit',
             })
         );
-        setIsLoaded(true);
-        console.log(stationsData);
+        setTimeout(() => {
+            setIsLoaded(true);
+        }, 1500);
     }
 
     function onFuelSelection(selection: FuelSelection) {
@@ -78,7 +80,7 @@ export default function App() {
                         })}
                     </>
                 ) : (
-                    <div>Tankstellen werden geladen...</div>
+                    <Spinner />
                 )}
             </section>
         </main>
