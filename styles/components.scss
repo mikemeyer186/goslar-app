@@ -68,70 +68,76 @@
 
 .toolbar {
     width: 100%;
-    padding: 16px 16px 0;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
 
-    .btn-selection {
-        height: 31px;
-        font-size: 1rem;
-        border-radius: $radius-btn;
-        padding: 4px 16px;
-        border: $border-button;
-        background-color: $bg-color-main;
-        color: $txt-color-btn;
-        transition: $transition-normal;
-        margin-right: 8px;
+    .toolbar-filter {
+        padding: 16px 0 0;
 
-        &:hover {
+        .btn-selection {
+            height: 36px;
+            font-size: 1rem;
+            font-family: 'Roboto', sans-serif;
+            border-radius: $radius-btn;
+            padding: 4px 16px;
+            border: $border-button;
+            background-color: $bg-color-main;
+            color: $txt-color-btn;
+            transition: $transition-normal;
+            margin-right: 8px;
             cursor: pointer;
-            background-color: $bg-btn-hover;
         }
-    }
 
-    .btn-active {
-        background-color: $bg-btn-active;
-        color: $txt-color-btn-active;
-
-        &:hover {
+        .btn-active {
             background-color: $bg-btn-active;
             color: $txt-color-btn-active;
+
+            &:hover {
+                background-color: $bg-btn-active;
+                color: $txt-color-btn-active;
+            }
         }
     }
 
-    .toolbar-slider-label {
-        font-size: 0.7rem;
-    }
-
-    .toolbar-slider-toggle {
-        width: 51px;
-        height: 31px;
-        padding: 2px;
-        border-radius: 100px;
-        background-color: $bg-slider-active;
+    .toolbar-slider {
         display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
+        justify-content: space-between;
         align-items: center;
-        cursor: pointer;
 
-        .toolbar-slider-knob {
-            width: 27px;
-            height: 27px;
-            background-color: $bg-color-main;
-            border-radius: 100px;
-            box-shadow: $shadow-knob;
-            transform: translateX(20px);
-            transition: $transition-normal;
+        .toolbar-slider-label {
+            font-size: 1rem;
         }
-    }
 
-    .slider-inactive {
-        background-color: $bg-slider-inactive;
+        .toolbar-slider-toggle {
+            width: 51px;
+            height: 31px;
+            padding: 2px;
+            border-radius: 100px;
+            background-color: $bg-slider-active;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            flex-shrink: 0;
+            cursor: pointer;
 
-        .toolbar-slider-knob {
-            transform: translateX(0);
+            .toolbar-slider-knob {
+                width: 27px;
+                height: 27px;
+                background-color: $bg-color-main;
+                border-radius: 100px;
+                box-shadow: $shadow-knob;
+                transform: translateX(20px);
+                transition: $transition-normal;
+            }
+        }
+
+        .slider-inactive {
+            background-color: $bg-slider-inactive;
+
+            .toolbar-slider-knob {
+                transform: translateX(0);
+            }
         }
     }
 }
