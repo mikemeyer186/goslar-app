@@ -1,8 +1,9 @@
 interface StationTileProps {
     updated: string;
+    openModal: CallableFunction;
 }
 
-export default function Footer({ updated }: StationTileProps) {
+export default function Footer({ updated, openModal }: StationTileProps) {
     return (
         <section className="footer">
             <div className="footer-updated">Letztes Preisupdate: {updated} Uhr</div>
@@ -13,9 +14,13 @@ export default function Footer({ updated }: StationTileProps) {
             </div>
 
             <div className="footer-links">
-                <span>Impressum</span>
+                <span className="footer-links-label" onClick={() => openModal('imprint')}>
+                    Impressum
+                </span>
                 <span> | </span>
-                <span>Datenschutz</span>
+                <span className="footer-links-label" onClick={() => openModal('datpro')}>
+                    Datenschutz
+                </span>
             </div>
 
             <span>© 2024</span>

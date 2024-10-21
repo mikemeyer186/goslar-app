@@ -219,6 +219,7 @@
         box-shadow: $shadow-tile;
         border-radius: $radius-tile;
         padding: 16px;
+        margin-bottom: 16px;
         width: 100%;
         height: 85px;
         transition: $transition-normal;
@@ -323,6 +324,12 @@
     text-align: center;
     width: 100%;
 
+    .footer-links-label {
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
     .footer-updated {
         font-size: 0.7rem;
     }
@@ -337,7 +344,58 @@
     }
 }
 
+.imprint-modal,
+.datpro-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: $bg-color-main;
+
+    .scroll-container {
+        height: 100svh;
+        width: 100vw;
+        overflow-y: auto;
+        display: flex;
+        justify-content: center;
+    }
+
+    .close-icon {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 48px;
+        color: $txt-color-close;
+        padding: 16px;
+        background-color: $bg-color-main;
+        text-align: end;
+        box-shadow: $shadow-tile;
+    }
+
+    .imprint-container {
+        text-align: center;
+        padding: 48px 16px;
+    }
+
+    .datpro-container {
+        padding: 48px 16px;
+    }
+}
+
 //animations
+.fade-effect {
+    animation: fadeIn 225ms ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 @keyframes rotate {
     0% {
         transform: rotate(0deg);

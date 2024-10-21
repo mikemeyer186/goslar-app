@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { loadCurrentFuelPrices } from './services/firebase';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import Station from './interfaces/station';
 import TileStation from './components/stationTile';
 import Toolbar from './components/toolbar';
 import Spinner from './components/spinner';
 import Footer from './components/footer';
+import Imprint from './components/imprint';
+import DataProtection from './components/dataprotection';
 
 export default function App() {
+    const [itemParent] = useAutoAnimate({ duration: 150, easing: 'ease-in' });
     const [fuelStations, setFuelStations] = useState<Station[]>([]);
     const [lastUpdate, setLastUpdate] = useState<string>('');
     const [isLoaded, setIsLoaded] = useState(false);
@@ -14,6 +18,8 @@ export default function App() {
     const [showOnlyOpenStations, setShowOnlyOpenStations] = useState(true);
     const [selectedCities, setSelectedCities] = useState<string[]>([]);
     const [isFiltered, setIsFiltered] = useState<boolean>(false);
+    const [isImprintOpen, setIsImprintOpen] = useState(false);
+    const [isDatProOpen, setIsDatProOpen] = useState(false);
     const didInit = useRef(false);
     let sortedFuelStations: Station[] = [];
     let openStations: Station[] = [];
@@ -49,6 +55,24 @@ export default function App() {
         }
     }
 
+    function openModal(modal: string) {
+        document.body.classList.add('overflow-hidden');
+        if (modal === 'imprint') {
+            setIsImprintOpen(true);
+        } else if (modal === 'datpro') {
+            setIsDatProOpen(true);
+        }
+    }
+
+    function closeModal(modal: string) {
+        document.body.classList.remove('overflow-hidden');
+        if (modal === 'imprint') {
+            setIsImprintOpen(false);
+        } else if (modal === 'datpro') {
+            setIsDatProOpen(false);
+        }
+    }
+
     useEffect(() => {
         if (!didInit.current) {
             handlePriceLoading();
@@ -64,7 +88,7 @@ export default function App() {
         }
     }, [selectedCities]);
 
-    // sorting of stations by pice (selected fuel button)
+    // sorting of stations by price (selected fuel button)
     sortedFuelStations = fuelStations
         .slice()
         .sort((a: Station, b: Station) => a[activeSelection] - b[activeSelection])
@@ -85,31 +109,47 @@ export default function App() {
     }
 
     return (
-        <main>
-            <section className="station-container">
-                {isLoaded ? (
-                    <>
-                        <Toolbar
-                            onFuelSelection={onFuelSelection}
-                            activeSelection={activeSelection}
-                            onSliderMove={onSliderMove}
-                            showOnlyOpenStations={showOnlyOpenStations}
-                            openStations={openStations}
-                            selectedCities={selectedCities}
-                            setSelectedCities={setSelectedCities}
-                            isFiltered={isFiltered}
-                        ></Toolbar>
+        <>
+            <main>
+                <section className="station-container">
+                    {isLoaded ? (
+                        <>
+                            <Toolbar
+                                onFuelSelection={onFuelSelection}
+                                activeSelection={activeSelection}
+                                onSliderMove={onSliderMove}
+                                showOnlyOpenStations={showOnlyOpenStations}
+                                openStations={openStations}
+                                selectedCities={selectedCities}
+                                setSelectedCities={setSelectedCities}
+                                isFiltered={isFiltered}
+                            ></Toolbar>
 
-                        {filteredFuelStations.map((station: Station) => {
-                            return <TileStation key={station.id} station={station} activeSelection={activeSelection} />;
-                        })}
+                            <div className="station-wrapper" ref={itemParent}>
+                                {filteredFuelStations.map((station: Station) => {
+                                    return <TileStation key={station.id} station={station} activeSelection={activeSelection} />;
+                                })}
+                            </div>
 
-                        <Footer updated={lastUpdate} />
-                    </>
-                ) : (
-                    <Spinner />
-                )}
-            </section>
-        </main>
+                            <Footer updated={lastUpdate} openModal={openModal} />
+                        </>
+                    ) : (
+                        <Spinner />
+                    )}
+                </section>
+            </main>
+
+            {isImprintOpen && (
+                <div className="imprint-modal fade-effect">
+                    <Imprint closeModal={closeModal}></Imprint>
+                </div>
+            )}
+
+            {isDatProOpen && (
+                <div className="datpro-modal fade-effect">
+                    <DataProtection closeModal={closeModal}></DataProtection>
+                </div>
+            )}
+        </>
     );
 }
