@@ -45,6 +45,7 @@ export default function Imprint({ closeModal }: ImprintTileProps) {
                     <p>
                         Quelle: <a href="https://www.e-recht24.de">eRecht24</a>
                     </p>
+                    <br />
                 </div>
             </div>
         </div>
