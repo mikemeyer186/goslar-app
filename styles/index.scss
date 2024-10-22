@@ -17,6 +17,11 @@ body {
     font-family: 'Roboto', sans-serif;
     color: $txt-color-main;
     background-color: $bg-color-main;
+
+    @media (min-width: 480px) {
+        display: flex;
+        justify-content: center;
+    }
 }
 
 main {
@@ -25,6 +30,14 @@ main {
     flex-direction: column;
     padding-top: $height-navbar;
     padding: $padding-normal;
+
+    @media (min-width: 480px) {
+        width: 480px;
+    }
+
+    @media (max-width: 300px) {
+        padding: $padding-normal 8px $padding-normal 8px;
+    }
 }
 
 .filter-backdrop {

@@ -91,6 +91,10 @@
             transition: $transition-normal;
             margin-right: 8px;
             cursor: pointer;
+
+            @media (max-width: 300px) {
+                margin-right: 4px;
+            }
         }
 
         .btn-active {
@@ -143,6 +147,10 @@
             z-index: -1;
             opacity: 0;
 
+            @media (max-width: 300px) {
+                right: -16px;
+            }
+
             .filter-menu-list {
                 font-size: 1.1rem;
                 line-height: 1.7;
@@ -155,6 +163,10 @@
                     width: 20px;
                     height: 20px;
                     cursor: pointer;
+                }
+
+                .filter-label {
+                    text-transform: capitalize;
                 }
             }
         }
@@ -242,12 +254,29 @@
                 .station-adress {
                     font-weight: 400;
                     font-size: 0.9rem;
+                    text-transform: capitalize;
+
+                    @media (max-width: 330px) {
+                        font-size: 0.8rem;
+                    }
                 }
             }
 
             .station-right {
                 font-size: 1.7rem;
                 font-weight: 700;
+
+                @media (max-width: 348px) {
+                    font-size: 1.4rem;
+                }
+
+                @media (max-width: 330px) {
+                    font-size: 1.2rem;
+                }
+
+                @media (max-width: 296px) {
+                    font-size: 1rem;
+                }
             }
         }
 
@@ -370,6 +399,7 @@
         background-color: $bg-color-main;
         text-align: end;
         box-shadow: $shadow-tile;
+        cursor: pointer;
     }
 
     .imprint-container {
@@ -379,6 +409,25 @@
 
     .datpro-container {
         padding: 48px 16px;
+
+        @media (max-width: 348px) {
+            h1 {
+                font-size: 1rem;
+            }
+
+            h3 {
+                font-size: 0.9rem;
+            }
+
+            h4 {
+                font-size: 0.8rem;
+            }
+
+            p,
+            li {
+                font-size: 0.7rem;
+            }
+        }
     }
 }
 

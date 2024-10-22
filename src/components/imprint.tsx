@@ -29,12 +29,17 @@ export default function Imprint({ closeModal }: ImprintTileProps) {
 
                     <h3>Kontakt</h3>
                     <p>
-                        Telefon: +49 (0) 151 255 267 04
+                        <span>Website: </span>
+                        <a className="mail-link" href="https://mike-meyer.dev">
+                            mike-meyer.dev
+                        </a>
                         <br />
                         <span>E-Mail: </span>
                         <a className="mail-link" href="mailto:contact@mike-meyer.dev?subject=Goslar App">
                             contact@mike-meyer.dev
                         </a>
+                        <br />
+                        Telefon: +49 (0) 151 255 267 04
                     </p>
 
                     <p>

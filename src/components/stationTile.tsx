@@ -24,12 +24,12 @@ export default function StationTile({ station, activeSelection }: StationTilePro
                     <span className="station-brand">{station.brand}</span>
                     <div className="station-adress">
                         <div>
-                            <span className="station-street">{station.street} </span>
+                            <span className="station-street">{station.street.toLowerCase()} </span>
                             <span className="station-housenumber">{station.houseNumber}</span>
                         </div>
                         <div>
                             <span className="station-postcode">{station.postCode} </span>
-                            <span className="station-city">{station.place}</span>
+                            <span className="station-city">{station.place.toLowerCase()}</span>
                         </div>
                     </div>
                 </div>

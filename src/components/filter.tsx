@@ -36,7 +36,9 @@ export default function Filter({ openStations, setSelectedCities, selectedCities
                             checked={selectedCities.includes(city)}
                             onChange={handelFilterChange}
                         ></input>
-                        <label htmlFor={`input ${index}`}>{city}</label>
+                        <label className="filter-label" htmlFor={`input ${index}`}>
+                            {city.toLowerCase()}
+                        </label>
                     </div>
                 );
             })}
