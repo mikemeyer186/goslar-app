@@ -17,6 +17,15 @@ export default function StationTile({ station, activeSelection }: StationTilePro
         }
     }
 
+    function truncatePrice(price: number) {
+        return (
+            price
+                .toString()
+                .replace('.', ',')
+                .replace(/(\d+,\d{2})\d*/, '$1') + ' €'
+        );
+    }
+
     return (
         <section className={`station-tile ${stationClicked ? 'station-large' : ''}`} onClick={onStationClick}>
             <div className="station-small-content">
@@ -35,11 +44,11 @@ export default function StationTile({ station, activeSelection }: StationTilePro
                 </div>
 
                 <div className="station-right">
-                    {activeSelection === 'e5' && <div>{station.e5 ? station.e5.toFixed(2).replace('.', ',') + ' €' : 'k. A.'}</div>}
+                    {activeSelection === 'e5' && <div>{station.e5 ? truncatePrice(station.e5) : 'k. A.'}</div>}
 
-                    {activeSelection === 'e10' && <div>{station.e10 ? station.e10.toFixed(2).replace('.', ',') + ' €' : 'k. A.'}</div>}
+                    {activeSelection === 'e10' && <div>{station.e10 ? truncatePrice(station.e10) : 'k. A.'}</div>}
 
-                    {activeSelection === 'diesel' && <div>{station.diesel ? station.diesel.toFixed(2).replace('.', ',') + ' €' : 'k. A.'}</div>}
+                    {activeSelection === 'diesel' && <div>{station.diesel ? truncatePrice(station.diesel) : 'k. A.'}</div>}
                 </div>
             </div>
 
@@ -52,15 +61,15 @@ export default function StationTile({ station, activeSelection }: StationTilePro
                     <tbody>
                         <tr>
                             <td>Diesel:</td>
-                            <td className="station-table-price">{station.diesel ? station.diesel.toFixed(2).replace('.', ',') + '€' : '-'}</td>
+                            <td className="station-table-price">{station.diesel ? truncatePrice(station.diesel) : '-'}</td>
                         </tr>
                         <tr>
                             <td>E5:</td>
-                            <td className="station-table-price">{station.e5 ? station.e5.toFixed(2).replace('.', ',') + '€' : '-'}</td>
+                            <td className="station-table-price">{station.e5 ? truncatePrice(station.e5) : '-'}</td>
                         </tr>
                         <tr>
                             <td>E10:</td>
-                            <td className="station-table-price">{station.e10 ? station.e10.toFixed(2).replace('.', ',') + '€' : '-'}</td>
+                            <td className="station-table-price">{station.e10 ? truncatePrice(station.e10) : '-'}</td>
                         </tr>
                     </tbody>
                 </table>

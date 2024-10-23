@@ -381,6 +381,10 @@
     left: 0;
     background-color: $bg-color-main;
 
+    a {
+        color: $txt-color-link;
+    }
+
     .scroll-container {
         height: 100svh;
         width: 100vw;
