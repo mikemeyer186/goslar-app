@@ -8,6 +8,7 @@ import Spinner from './components/spinner';
 import Footer from './components/footer';
 import Imprint from './components/imprint';
 import DataProtection from './components/dataprotection';
+import { cities } from './data/cities';
 
 export default function App() {
     const [itemParent] = useAutoAnimate({ duration: 150, easing: 'ease-in' });
@@ -27,8 +28,11 @@ export default function App() {
     type FuelSelection = 'e5' | 'e10' | 'diesel';
 
     async function handlePriceLoading() {
+        const postalCodes = cities.flatMap((city) => city.codes);
         const stationsData = await loadCurrentFuelPrices();
-        setFuelStations(stationsData?.data);
+        const filteredStationsData = stationsData?.data.filter((station: Station) => postalCodes.includes(station.postCode.toString()));
+
+        setFuelStations(filteredStationsData);
         setLastUpdate(
             new Date(stationsData?.updated.seconds * 1000).toLocaleDateString('de-DE', {
                 day: '2-digit',
