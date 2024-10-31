@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { loadCurrentFuelPrices } from './services/firebase';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
+import { cities } from './data/cities';
 import Station from './interfaces/station';
 import TileStation from './components/stationTile';
 import Toolbar from './components/toolbar';
@@ -8,7 +9,6 @@ import Spinner from './components/spinner';
 import Footer from './components/footer';
 import Imprint from './components/imprint';
 import DataProtection from './components/dataprotection';
-import { cities } from './data/cities';
 
 export default function App() {
     const [itemParent] = useAutoAnimate({ duration: 150, easing: 'ease-in' });
@@ -107,7 +107,9 @@ export default function App() {
 
     // filters selected stations by cities (filter menu)
     if (isFiltered) {
-        filteredFuelStations = openStations.filter((station: Station) => selectedCities.includes(station.place));
+        filteredFuelStations = openStations.filter((station: Station) =>
+            selectedCities.some((city) => station.place.toLowerCase().includes(city.toLowerCase()))
+        );
     } else {
         filteredFuelStations = openStations;
     }

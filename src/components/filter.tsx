@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { cities } from '../data/cities';
 import Station from '../interfaces/station';
 
 interface FilterProps {
@@ -9,7 +10,9 @@ interface FilterProps {
 
 export default function Filter({ openStations, setSelectedCities, selectedCities }: FilterProps) {
     const uniqueCities = useMemo(() => {
-        return [...new Set(openStations.map((station) => station.place))].sort((a, b) => a.localeCompare(b));
+        const postalCodes = openStations.slice().flatMap((station: Station) => station.postCode.toString());
+        const uniqueFilterCities = cities.filter((city) => city.codes.some((code) => postalCodes.includes(code)));
+        return [...new Set(uniqueFilterCities.map((city) => city.city))].sort((a, b) => a.localeCompare(b));
     }, [openStations]);
 
     function handelFilterChange(event: React.ChangeEvent<HTMLInputElement>) {
