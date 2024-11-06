@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const axios = require('axios');
 const admin = require('./firebase_admin');
+const cities = require('./cities.json');
 
 const db = admin.firestore();
 
@@ -22,6 +23,7 @@ exports.fetchFuelPrices = functions
             const urlRadius = functions.config().tanker.api_radius;
             const urlSection_2 = functions.config().tanker.api_url_2;
             const apiUrl = urlSection_1 + urlRadius + urlSection_2 + apiKey;
+            const postalCodes = cities.flatMap((city) => city.codes);
 
             // fetching the data from API
             const response = await axios.get(apiUrl, {
@@ -31,13 +33,13 @@ exports.fetchFuelPrices = functions
             });
 
             const stations = response.data.stations;
-            const nearestStations = stations.slice().filter((station) => station.dist <= 3);
+            const filteredStations = stations.filter((station) => postalCodes.includes(station.postCode.toString()));
             const timestamp = new Date();
 
             // filtering the cheapest stations
-            const cheapestDiesel = nearestStations.sort((a, b) => a.diesel - b.diesel).filter((station) => station.diesel != null);
-            const cheapestE5 = nearestStations.sort((a, b) => a.e5 - b.e5).filter((station) => station.e5 != null);
-            const cheapestE10 = nearestStations.sort((a, b) => a.e10 - b.e10).filter((station) => station.e10 != null);
+            const cheapestDiesel = filteredStations.sort((a, b) => a.diesel - b.diesel).filter((station) => station.diesel != null);
+            const cheapestE5 = filteredStations.sort((a, b) => a.e5 - b.e5).filter((station) => station.e5 != null);
+            const cheapestE10 = filteredStations.sort((a, b) => a.e10 - b.e10).filter((station) => station.e10 != null);
 
             const cheapestStations = {
                 diesel: cheapestDiesel[0],
@@ -53,7 +55,7 @@ exports.fetchFuelPrices = functions
 
             const allDocRef = await db.collection('fuel_prices').doc('all').set({
                 updated: timestamp,
-                data: stations,
+                data: filteredStations,
             });
 
             console.log('Fuel prices fetched and stored successfully in Firestore.');

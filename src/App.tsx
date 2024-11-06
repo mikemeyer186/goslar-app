@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { loadCurrentFuelPrices } from './services/firebase';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import { cities } from './data/cities';
 import Station from './interfaces/station';
 import TileStation from './components/stationTile';
 import Toolbar from './components/toolbar';
@@ -28,11 +27,9 @@ export default function App() {
     type FuelSelection = 'e5' | 'e10' | 'diesel';
 
     async function handlePriceLoading() {
-        const postalCodes = cities.flatMap((city) => city.codes);
         const stationsData = await loadCurrentFuelPrices();
-        const filteredStationsData = stationsData?.data.filter((station: Station) => postalCodes.includes(station.postCode.toString()));
 
-        setFuelStations(filteredStationsData);
+        setFuelStations(stationsData?.data);
         setLastUpdate(
             new Date(stationsData?.updated.seconds * 1000).toLocaleDateString('de-DE', {
                 day: '2-digit',
