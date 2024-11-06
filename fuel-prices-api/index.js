@@ -96,15 +96,18 @@ app.get('/cheapest', async (req, res) => {
 // Endpoint: /historic
 app.get('/historic', async (req, res) => {
     try {
-        const snapshot = await db.collection('fuel_prices_historic').get();
-        const data = [];
-        snapshot.forEach((doc) => {
-            data.push({ id: doc.id, ...doc.data() });
-        });
-        res.status(200).json(data);
+        const currentDocRef = db.collection('fuel_prices').doc('historic');
+        const doc = await currentDocRef.get();
+
+        if (!doc.exists) {
+            return res.status(404).json({ error: 'No fuel prices found!' });
+        }
+
+        const data = doc.data();
+        return res.status(200).json(data);
     } catch (error) {
-        console.error('Fehler beim Abrufen der historischen Spritpreise:', error);
-        res.status(500).json({ error: 'Interner Serverfehler.' });
+        console.error('Error while requesting fuel prices:', error);
+        res.status(500).json({ error: 'Internal server error.' });
     }
 });
 

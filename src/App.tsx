@@ -30,15 +30,7 @@ export default function App() {
         const stationsData = await loadCurrentFuelPrices();
 
         setFuelStations(stationsData?.data);
-        setLastUpdate(
-            new Date(stationsData?.updated.seconds * 1000).toLocaleDateString('de-DE', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-            })
-        );
+        setLastUpdate(stationsData?.updated);
         setTimeout(() => {
             setIsLoaded(true);
         }, 1500);

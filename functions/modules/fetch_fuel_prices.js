@@ -34,7 +34,15 @@ exports.fetchFuelPrices = functions
 
             const stations = response.data.stations;
             const filteredStations = stations.filter((station) => postalCodes.includes(station.postCode.toString()));
-            const timestamp = new Date();
+            const timestamp = new Date().toLocaleString('de-DE', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'Europe/Berlin',
+            });
+            let historicStations = [];
 
             // filtering the cheapest stations
             const cheapestDiesel = filteredStations.sort((a, b) => a.diesel - b.diesel).filter((station) => station.diesel != null);
@@ -47,16 +55,38 @@ exports.fetchFuelPrices = functions
                 e10: cheapestE10[0],
             };
 
+            // creating historic station object
+            filteredStations.forEach((station) => {
+                const stationObject = {
+                    id: station.id,
+                    diesel: station.diesel,
+                    e5: station.e5,
+                    e10: station.e10,
+                    isOpen: station.isOpen,
+                };
+                historicStations = [...historicStations, stationObject];
+            });
+
             // storing in Firestore
+            const allDocRef = await db.collection('fuel_prices').doc('all').set({
+                updated: timestamp,
+                data: filteredStations,
+            });
+
             const cheapestDocRef = await db.collection('fuel_prices').doc('cheapest').set({
                 updated: timestamp,
                 data: cheapestStations,
             });
 
-            const allDocRef = await db.collection('fuel_prices').doc('all').set({
-                updated: timestamp,
-                data: filteredStations,
-            });
+            const historicDocRef = await db
+                .collection('fuel_prices')
+                .doc('historic')
+                .set(
+                    {
+                        [timestamp]: historicStations,
+                    },
+                    { merge: true }
+                );
 
             console.log('Fuel prices fetched and stored successfully in Firestore.');
         } catch (error) {
