@@ -11,3 +11,14 @@ export async function loadCurrentFuelPrices() {
         console.log('No such document!');
     }
 }
+
+export async function loadHistoricFuelPrices() {
+    const docRef = doc(db, 'fuel_prices', 'historic');
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        return docSnap.data();
+    } else {
+        console.log('No such document!');
+    }
+}

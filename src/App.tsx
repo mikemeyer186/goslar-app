@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { loadCurrentFuelPrices } from './services/firebase';
+import { loadCurrentFuelPrices, loadHistoricFuelPrices } from './services/firebase';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import Station from './interfaces/station';
+import HistoricData from './interfaces/historic-data';
+import HistoricPrices from './interfaces/historic-prices';
 import TileStation from './components/stationTile';
 import Toolbar from './components/toolbar';
 import Spinner from './components/spinner';
@@ -12,6 +14,8 @@ import DataProtection from './components/dataprotection';
 export default function App() {
     const [itemParent] = useAutoAnimate({ duration: 150, easing: 'ease-in' });
     const [fuelStations, setFuelStations] = useState<Station[]>([]);
+    const [historicPrices1Day, setHistoricPrices1Day] = useState<HistoricPrices[]>([]);
+    const [historicPrices7Days, setHistoricPrices7Days] = useState<HistoricPrices[]>([]);
     const [lastUpdate, setLastUpdate] = useState<string>('');
     const [isLoaded, setIsLoaded] = useState(false);
     const [activeSelection, setActiveSelection] = useState<FuelSelection>('diesel');
@@ -28,16 +32,54 @@ export default function App() {
 
     async function handlePriceLoading() {
         const stationsData = await loadCurrentFuelPrices();
+        const historicData = await loadHistoricFuelPrices();
 
         setFuelStations(stationsData?.data);
         setLastUpdate(stationsData?.updated);
+        handleHistoricDataFiltering(historicData as HistoricData, stationsData?.updated);
         setTimeout(() => {
             setIsLoaded(true);
         }, 1500);
     }
 
+    function handleHistoricDataFiltering(historicData: HistoricData, updated: string) {
+        const parsedTimestamp = parseTimestamp(updated);
+        const timestamp1DayBack: string = new Date(parsedTimestamp.setDate(parsedTimestamp.getDate() - 1)).toLocaleString('de-DE', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'Europe/Berlin',
+        });
+        const timestamp7DaysBack: string = new Date(parsedTimestamp.setDate(parsedTimestamp.getDate() - 6)).toLocaleString('de-DE', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'Europe/Berlin',
+        });
+
+        setHistoricPrices1Day(historicData[timestamp1DayBack]);
+        setHistoricPrices7Days(historicData[timestamp7DaysBack]);
+    }
+
     function onFuelSelection(selection: FuelSelection) {
         setActiveSelection(selection);
+    }
+
+    function parseTimestamp(dateString: string) {
+        const [datePart, timePart] = dateString.split(', ');
+        const [dayStr, monthStr, yearStr] = datePart.split('.');
+        const [hoursStr, minutesStr] = timePart.split(':');
+        const day = parseInt(dayStr, 10);
+        const month = parseInt(monthStr, 10);
+        const year = parseInt(yearStr, 10);
+        const hours = parseInt(hoursStr, 10);
+        const minutes = parseInt(minutesStr, 10);
+        const date = new Date(year, month - 1, day, hours, minutes);
+        return date;
     }
 
     function onSliderMove() {
@@ -122,7 +164,15 @@ export default function App() {
 
                             <div className="station-wrapper" ref={itemParent}>
                                 {filteredFuelStations.map((station: Station) => {
-                                    return <TileStation key={station.id} station={station} activeSelection={activeSelection} />;
+                                    return (
+                                        <TileStation
+                                            key={station.id}
+                                            station={station}
+                                            activeSelection={activeSelection}
+                                            prices1Day={historicPrices1Day.find((prices) => prices.id === station.id)}
+                                            prices7Days={historicPrices7Days.find((prices) => prices.id === station.id)}
+                                        />
+                                    );
                                 })}
                             </div>
 

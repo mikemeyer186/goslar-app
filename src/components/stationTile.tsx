@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import Station from '../interfaces/station';
+import HistoricPrices from '../interfaces/historic-prices';
 
 interface StationTileProps {
     station: Station;
     activeSelection: string;
+    prices1Day: HistoricPrices | undefined;
+    prices7Days: HistoricPrices | undefined;
 }
 
-export default function StationTile({ station, activeSelection }: StationTileProps) {
+export default function StationTile({ station, activeSelection, prices1Day, prices7Days }: StationTileProps) {
     const [stationClicked, setStationClicked] = useState(false);
 
     function onStationClick() {
@@ -62,14 +65,20 @@ export default function StationTile({ station, activeSelection }: StationTilePro
                         <tr>
                             <td>Diesel:</td>
                             <td className="station-table-price">{station.diesel ? truncatePrice(station.diesel) : '-'}</td>
+                            <td className="station-table-price">{prices1Day?.diesel ? truncatePrice(prices1Day.diesel - station.diesel) : '-'}</td>
+                            <td className="station-table-price">{prices7Days?.diesel ? truncatePrice(prices7Days.diesel - station.diesel) : '-'}</td>
                         </tr>
                         <tr>
                             <td>E5:</td>
                             <td className="station-table-price">{station.e5 ? truncatePrice(station.e5) : '-'}</td>
+                            <td className="station-table-price">{prices1Day?.e5 ? truncatePrice(prices1Day.e5 - station.e5) : '-'}</td>
+                            <td className="station-table-price">{prices7Days?.e5 ? truncatePrice(prices7Days.e5 - station.e5) : '-'}</td>
                         </tr>
                         <tr>
                             <td>E10:</td>
                             <td className="station-table-price">{station.e10 ? truncatePrice(station.e10) : '-'}</td>
+                            <td className="station-table-price">{prices1Day?.e10 ? truncatePrice(prices1Day.e10 - station.e10) : '-'}</td>
+                            <td className="station-table-price">{prices7Days?.e10 ? truncatePrice(prices7Days.e10 - station.e10) : '-'}</td>
                         </tr>
                     </tbody>
                 </table>
