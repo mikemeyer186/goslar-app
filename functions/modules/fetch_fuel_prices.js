@@ -78,15 +78,8 @@ exports.fetchFuelPrices = functions
                 data: cheapestStations,
             });
 
-            const historicDocRef = await db
-                .collection('fuel_prices')
-                .doc('historic')
-                .set(
-                    {
-                        [timestamp]: historicStations,
-                    },
-                    { merge: true }
-                );
+            const historicDocRef = db.collection('fuel_prices').doc('historic').collection('timestamps');
+            await historicDocRef.doc(timestamp).set({ data: historicStations });
 
             console.log('Fuel prices fetched and stored successfully in Firestore.');
         } catch (error) {

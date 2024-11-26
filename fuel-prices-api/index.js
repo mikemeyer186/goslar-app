@@ -96,14 +96,23 @@ app.get('/cheapest', async (req, res) => {
 // Endpoint: /historic
 app.get('/historic', async (req, res) => {
     try {
-        const currentDocRef = db.collection('fuel_prices').doc('historic');
-        const doc = await currentDocRef.get();
+        const timestampsCollectionRef = db.collection('fuel_prices').doc('historic').collection('timestamps');
 
-        if (!doc.exists) {
+        const snapshot = await timestampsCollectionRef.orderBy('__name__', 'desc').limit(100).get();
+
+        if (snapshot.empty) {
             return res.status(404).json({ error: 'No fuel prices found!' });
         }
 
-        const data = doc.data();
+        const data = [];
+        snapshot.forEach((doc) => {
+            data.push({
+                timestamp: doc.id,
+                ...doc.data(),
+            });
+        });
+
+        data.sort((a, b) => b.timestamp - a.timestamp);
         return res.status(200).json(data);
     } catch (error) {
         console.error('Error while requesting fuel prices:', error);
