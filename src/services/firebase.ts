@@ -17,7 +17,7 @@ export async function loadCurrentFuelPrices() {
 export async function loadHistoricFuelPrices() {
     try {
         const timestamps = collection(db, 'fuel_prices', 'historic', 'timestamps');
-        const q = query(timestamps, orderBy('__name__', 'desc'), limit(100));
+        const q = query(timestamps, orderBy('__name__', 'desc'), limit(200));
         const snapshot = await getDocs(q);
         const data: HistoricData = {};
 
@@ -29,7 +29,7 @@ export async function loadHistoricFuelPrices() {
         } else {
             console.log('No fuel prices found!');
         }
-        console.log(data);
+        console.log(Object.keys(data).length);
 
         return data;
     } catch (error) {

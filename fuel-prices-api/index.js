@@ -49,7 +49,7 @@ app.use(authenticateApiKey);
 // Endpoint: /
 app.get('/', async (req, res) => {
     try {
-        const data = 'Please request "/cheapest", "/all" or "/historic" to get fuel prices.';
+        const data = 'Please request "/all" or "/cheapest" to get fuel prices. You can also request a specific station id with /<id>.';
         return res.status(200).json(data);
     } catch (error) {
         console.error('Error while requesting fuel prices:', error);
@@ -62,6 +62,26 @@ app.get('/all', async (req, res) => {
     try {
         const currentDocRef = db.collection('fuel_prices').doc('all');
         const doc = await currentDocRef.get();
+
+        if (!doc.exists) {
+            return res.status(404).json({ error: 'No fuel prices found!' });
+        }
+
+        const data = doc.data();
+        return res.status(200).json(data);
+    } catch (error) {
+        console.error('Error while requesting fuel prices:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+// Endpoint: /id
+app.get('/:id', async (req, res) => {
+    const stationId = req.params.id;
+
+    try {
+        const stationDocRef = db.collection('fuel_prices').doc(stationId);
+        const doc = await stationDocRef.get();
 
         if (!doc.exists) {
             return res.status(404).json({ error: 'No fuel prices found!' });

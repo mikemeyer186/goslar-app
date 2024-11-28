@@ -65,20 +65,20 @@ export default function StationTile({ station, activeSelection, prices1Day, pric
                         <tr>
                             <td>Diesel:</td>
                             <td className="station-table-price">{station.diesel ? truncatePrice(station.diesel) : '-'}</td>
-                            <td className="station-table-price">{prices1Day?.diesel ? truncatePrice(prices1Day.diesel - station.diesel) : '-'}</td>
-                            <td className="station-table-price">{prices7Days?.diesel ? truncatePrice(prices7Days.diesel - station.diesel) : '-'}</td>
+                            <td className="station-table-price">{prices1Day?.diesel ? truncatePrice(station.diesel - prices1Day.diesel) : '-'}</td>
+                            <td className="station-table-price">{prices7Days?.diesel ? truncatePrice(station.diesel - prices7Days.diesel) : '-'}</td>
                         </tr>
                         <tr>
                             <td>E5:</td>
                             <td className="station-table-price">{station.e5 ? truncatePrice(station.e5) : '-'}</td>
-                            <td className="station-table-price">{prices1Day?.e5 ? truncatePrice(prices1Day.e5 - station.e5) : '-'}</td>
-                            <td className="station-table-price">{prices7Days?.e5 ? truncatePrice(prices7Days.e5 - station.e5) : '-'}</td>
+                            <td className="station-table-price">{prices1Day?.e5 ? truncatePrice(station.e5 - prices1Day.e5) : '-'}</td>
+                            <td className="station-table-price">{prices7Days?.e5 ? truncatePrice(station.e5 - prices7Days.e5) : '-'}</td>
                         </tr>
                         <tr>
                             <td>E10:</td>
                             <td className="station-table-price">{station.e10 ? truncatePrice(station.e10) : '-'}</td>
-                            <td className="station-table-price">{prices1Day?.e10 ? truncatePrice(prices1Day.e10 - station.e10) : '-'}</td>
-                            <td className="station-table-price">{prices7Days?.e10 ? truncatePrice(prices7Days.e10 - station.e10) : '-'}</td>
+                            <td className="station-table-price">{prices1Day?.e10 ? truncatePrice(station.e10 - prices1Day.e10) : '-'}</td>
+                            <td className="station-table-price">{prices7Days?.e10 ? truncatePrice(station.e10 - prices7Days.e10) : '-'}</td>
                         </tr>
                     </tbody>
                 </table>

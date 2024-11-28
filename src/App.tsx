@@ -52,7 +52,7 @@ export default function App() {
             minute: '2-digit',
             timeZone: 'Europe/Berlin',
         });
-        const timestamp7DaysBack: string = new Date(parsedTimestamp.setDate(parsedTimestamp.getDate() - 6)).toLocaleString('de-DE', {
+        const timestamp7DaysBack: string = new Date(parsedTimestamp.setDate(parsedTimestamp.getDate() - 1)).toLocaleString('de-DE', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',

@@ -55,6 +55,48 @@ exports.fetchFuelPrices = functions
                 e10: cheapestE10[0],
             };
 
+            // calculate medium values
+            let mediumValues = {
+                diesel: 0,
+                e5: 0,
+                e10: 0,
+            };
+
+            let counter = {
+                diesel: 0,
+                e5: 0,
+                e10: 0,
+            };
+
+            let sum = {
+                diesel: 0,
+                e5: 0,
+                e10: 0,
+            };
+
+            filteredStations.forEach((station) => {
+                if (station.diesel && station.street !== 'A') {
+                    sum.diesel += station.diesel;
+                    counter.diesel += 1;
+                }
+                if (station.e5 && station.street !== 'A') {
+                    sum.e5 += station.e5;
+                    counter.e5 += 1;
+                }
+                if (station.e10 && station.street !== 'A') {
+                    sum.e10 += station.e10;
+                    counter.e10 += 1;
+                }
+            });
+
+            mediumValues = {
+                diesel: sum.diesel / counter.diesel,
+                e5: sum.e5 / counter.e5,
+                e10: sum.e10 / counter.e10,
+            };
+
+            console.log(mediumValues, counter, sum);
+
             // creating historic station object
             filteredStations.forEach((station) => {
                 const stationObject = {
@@ -80,6 +122,10 @@ exports.fetchFuelPrices = functions
 
             const historicDocRef = db.collection('fuel_prices').doc('historic').collection('timestamps');
             await historicDocRef.doc(timestamp).set({ data: historicStations });
+
+            filteredStations.forEach(async (station) => {
+                const stationDocRef = await db.collection('fuel_prices').doc(station.id).set(station);
+            });
 
             console.log('Fuel prices fetched and stored successfully in Firestore.');
         } catch (error) {
