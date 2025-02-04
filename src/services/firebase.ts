@@ -17,7 +17,7 @@ export async function loadCurrentFuelPrices() {
 export async function loadHistoricFuelPrices() {
     try {
         const timestamps = collection(db, 'fuel_prices', 'historic', 'timestamps');
-        const q = query(timestamps, orderBy('__name__', 'desc'), limit(200));
+        const q = query(timestamps, orderBy('__name__', 'desc'), limit(5000));
         const snapshot = await getDocs(q);
         const data: HistoricData = {};
 

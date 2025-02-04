@@ -10,6 +10,7 @@ import Spinner from './components/spinner';
 import Footer from './components/footer';
 import Imprint from './components/imprint';
 import DataProtection from './components/dataprotection';
+import Disclaimer from './components/disclaimer';
 
 export default function App() {
     const [itemParent] = useAutoAnimate({ duration: 150, easing: 'ease-in' });
@@ -24,11 +25,32 @@ export default function App() {
     const [isFiltered, setIsFiltered] = useState<boolean>(false);
     const [isImprintOpen, setIsImprintOpen] = useState(false);
     const [isDatProOpen, setIsDatProOpen] = useState(false);
+    const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
     const didInit = useRef(false);
     let sortedFuelStations: Station[] = [];
     let openStations: Station[] = [];
     let filteredFuelStations: Station[] = [];
     type FuelSelection = 'e5' | 'e10' | 'diesel';
+
+    async function consentLoading() {
+        setTimeout(() => {
+            if (UC_UI) {
+                if (UC_UI.areAllConsentsAccepted()) {
+                    handlePriceLoading();
+                    console.log('accepted');
+                } else {
+                    window.addEventListener('onAcceptAllServices', function () {
+                        handlePriceLoading();
+                        console.log('accepted');
+                    });
+                }
+            } else {
+                window.addEventListener('UC_UI_INITIALIZED', function (event) {
+                    console.log(event);
+                });
+            }
+        }, 1000);
+    }
 
     async function handlePriceLoading() {
         const stationsData = await loadCurrentFuelPrices();
@@ -52,7 +74,7 @@ export default function App() {
             minute: '2-digit',
             timeZone: 'Europe/Berlin',
         });
-        const timestamp7DaysBack: string = new Date(parsedTimestamp.setDate(parsedTimestamp.getDate() - 1)).toLocaleString('de-DE', {
+        const timestamp7DaysBack: string = new Date(parsedTimestamp.setDate(parsedTimestamp.getDate() - 7)).toLocaleString('de-DE', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
@@ -96,6 +118,8 @@ export default function App() {
             setIsImprintOpen(true);
         } else if (modal === 'datpro') {
             setIsDatProOpen(true);
+        } else if (modal === 'disclaimer') {
+            setIsDisclaimerOpen(true);
         }
     }
 
@@ -105,12 +129,14 @@ export default function App() {
             setIsImprintOpen(false);
         } else if (modal === 'datpro') {
             setIsDatProOpen(false);
+        } else if (modal === 'disclaimer') {
+            setIsDisclaimerOpen(false);
         }
     }
 
     useEffect(() => {
         if (!didInit.current) {
-            handlePriceLoading();
+            consentLoading();
             didInit.current = true;
         }
     }, []);
@@ -193,6 +219,12 @@ export default function App() {
             {isDatProOpen && (
                 <div className="datpro-modal fade-effect">
                     <DataProtection closeModal={closeModal}></DataProtection>
+                </div>
+            )}
+
+            {isDisclaimerOpen && (
+                <div className="disclaimer-modal fade-effect">
+                    <Disclaimer closeModal={closeModal}></Disclaimer>
                 </div>
             )}
         </>

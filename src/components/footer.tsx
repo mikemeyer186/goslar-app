@@ -21,9 +21,25 @@ export default function Footer({ updated, openModal }: StationTileProps) {
                 <span className="footer-links-label" onClick={() => openModal('datpro')}>
                     Datenschutz
                 </span>
+                <span> | </span>
+                <span className="footer-links-label" onClick={() => openModal('disclaimer')}>
+                    Disclaimer
+                </span>
             </div>
 
-            <span>© 2024</span>
+            <span>© 2025</span>
+
+            <div className="footer-links">
+                <a
+                    href="#"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        UC_UI.showSecondLayer();
+                    }}
+                >
+                    Cookie-Einstellungen
+                </a>
+            </div>
         </section>
     );
 }

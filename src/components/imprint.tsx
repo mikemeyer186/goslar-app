@@ -13,8 +13,6 @@ export default function Imprint({ closeModal }: ImprintTileProps) {
                 <div>
                     <h1>Impressum</h1>
 
-                    <h3>Angaben gemäß § 5 TMG</h3>
-
                     <div>
                         <p>
                             Mike Meyer
@@ -35,15 +33,11 @@ export default function Imprint({ closeModal }: ImprintTileProps) {
                         </a>
                         <br />
                         <span>E-Mail: </span>
-                        <a className="mail-link" href="mailto:contact@mike-meyer.dev?subject=Goslar App">
+                        <a className="mail-link" href="mailto:contact@mike-meyer.dev?subject=Tanken in Goslar">
                             contact@mike-meyer.dev
                         </a>
                         <br />
                         Telefon: +49 (0) 151 255 267 04
-                    </p>
-
-                    <p>
-                        Quelle: <a href="https://www.e-recht24.de">eRecht24</a>
                     </p>
                     <br />
                 </div>

@@ -354,9 +354,20 @@
     text-align: center;
     width: 100%;
 
-    .footer-links-label {
-        &:hover {
-            cursor: pointer;
+    .footer-links {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+
+        a {
+            color: $txt-color-link;
+        }
+
+        .footer-links-label {
+            &:hover {
+                cursor: pointer;
+            }
         }
     }
 
@@ -375,7 +386,8 @@
 }
 
 .imprint-modal,
-.datpro-modal {
+.datpro-modal,
+.disclaimer-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -410,6 +422,19 @@
     .imprint-container {
         text-align: center;
         padding: 48px 16px;
+    }
+
+    .disclaimer-container {
+        text-align: justify;
+        padding: 48px 16px;
+
+        h1 {
+            text-align: left;
+        }
+
+        .disclaimer-footer {
+            text-align: left;
+        }
     }
 
     .datpro-container {
