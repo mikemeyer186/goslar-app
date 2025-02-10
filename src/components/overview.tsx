@@ -67,6 +67,14 @@ export default function Overview() {
         }
     }
 
+    function startEventListener() {
+        document.addEventListener('click', handleClickEvent);
+
+        return () => {
+            document.removeEventListener('click', handleClickEvent);
+        };
+    }
+
     async function handleConsentLoading() {
         const params = searchParams.get('externalconsent');
         if (!params) {
@@ -172,14 +180,6 @@ export default function Overview() {
         } else if (modal === 'disclaimer') {
             setIsDisclaimerOpen(false);
         }
-    }
-
-    function startEventListener() {
-        document.addEventListener('click', handleClickEvent);
-
-        return () => {
-            document.removeEventListener('click', handleClickEvent);
-        };
     }
 
     useEffect(() => {

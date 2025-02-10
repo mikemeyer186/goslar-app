@@ -95,7 +95,61 @@ exports.fetchFuelPrices = functions
                 e10: sum.e10 / counter.e10,
             };
 
-            console.log(mediumValues, counter, sum);
+            // calculate min/max values
+            let minDiesel = Infinity,
+                maxDiesel = -Infinity;
+            let minE5 = Infinity,
+                maxE5 = -Infinity;
+            let minE10 = Infinity,
+                maxE10 = -Infinity;
+
+            filteredStations.forEach((station) => {
+                if (station.diesel && station.street !== 'A' && station.isOpen) {
+                    if (station.diesel < minDiesel) {
+                        minDiesel = station.diesel;
+                    }
+                    if (station.diesel > maxDiesel) {
+                        maxDiesel = station.diesel;
+                    }
+                }
+                if (station.e5 && station.street !== 'A' && station.isOpen) {
+                    if (station.e5 < minE5) {
+                        minE5 = station.e5;
+                    }
+                    if (station.e5 > maxE5) {
+                        maxE5 = station.e5;
+                    }
+                }
+                if (station.e10 && station.street !== 'A' && station.isOpen) {
+                    if (station.e10 < minE10) {
+                        minE10 = station.e10;
+                    }
+                    if (station.e10 > maxE10) {
+                        maxE10 = station.e10;
+                    }
+                }
+            });
+
+            const formatPrice = (price) => {
+                return price
+                    .toString()
+                    .replace('.', ',')
+                    .replace(/(\d+,\d{2})\d*/, '$1');
+            };
+
+            const description = `E5: von ${formatPrice(minE5)}€ bis ${formatPrice(maxE5)}€
+            E10: von ${formatPrice(minE10)}€ bis ${formatPrice(maxE10)}€
+            Diesel: von ${formatPrice(minDiesel)}€ bis ${formatPrice(maxDiesel)}€`;
+
+            const widgetData = {
+                title: 'Aktuelle Preise',
+                description: description,
+                image_url: '',
+                action: {
+                    type: 'link',
+                    url: 'https://tanken-in-goslar.de?externalconsent=true',
+                },
+            };
 
             // creating historic station object
             filteredStations.forEach((station) => {
@@ -126,6 +180,8 @@ exports.fetchFuelPrices = functions
             filteredStations.forEach(async (station) => {
                 const stationDocRef = await db.collection('fuel_prices').doc(station.id).set(station);
             });
+
+            await db.collection('fuel_prices').doc('widget1').set(widgetData);
 
             console.log('Fuel prices fetched and stored successfully in Firestore.');
         } catch (error) {
