@@ -11,6 +11,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    .spinner-text {
+        text-align: center;
+        width: 75%;
+        height: 38px;
+    }
 
     .loader {
         display: block;
@@ -20,6 +29,7 @@
         position: relative;
         animation: rotate 1s linear infinite;
     }
+
     .loader::before,
     .loader::after {
         content: '';
@@ -30,6 +40,7 @@
         border: 10px solid $bg-spinner-dark;
         animation: prixClipFix 2s linear infinite;
     }
+
     .loader::after {
         border-color: $bg-spinner-light;
         animation: prixClipFix 2s linear infinite, rotate 0.5s linear infinite reverse;

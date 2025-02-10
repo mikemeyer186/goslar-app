@@ -34,12 +34,45 @@ export default function Overview() {
     let filteredFuelStations: Station[] = [];
     type FuelSelection = 'e5' | 'e10' | 'diesel';
 
+    const [isAllConsentsAccepted, setAllConsentsAccepted] = useState<boolean>(() => {
+        const ucData = localStorage.getItem('uc_settings');
+        if (ucData) {
+            try {
+                const ucDataParsed = JSON.parse(ucData);
+                const ucServices = ucDataParsed.services;
+                return Array.isArray(ucServices) && ucServices.every((service: { status: boolean }) => service.status === true);
+            } catch (error) {
+                console.error('Error while parsing uc_settings:', error);
+            }
+        }
+        return false;
+    });
+    const prevConsentRef = useRef(isAllConsentsAccepted);
+
+    function handleClickEvent(e: MouseEvent) {
+        const eventPath = e.composedPath();
+        const bannerClicked = eventPath.some((node) => node instanceof HTMLElement && node.id === 'uc-center-container');
+
+        if (bannerClicked) {
+            setTimeout(() => {
+                const ucData = localStorage.getItem('uc_settings');
+
+                if (ucData) {
+                    const ucDataParsed = JSON.parse(ucData);
+                    const ucServices = ucDataParsed.services;
+                    const newConsentStatus = Array.isArray(ucServices) && ucServices.every((service: { status: boolean }) => service.status === true);
+                    setAllConsentsAccepted(newConsentStatus);
+                }
+            }, 1000);
+        }
+    }
+
     async function handleConsentLoading() {
         const params = searchParams.get('externalconsent');
         if (!params) {
             await handleConsentBannerLoad();
             window.addEventListener('UC_UI_INITIALIZED', function () {
-                console.log(UC_UI.getServicesBaseInfo());
+                startEventListener();
                 if (UC_UI.areAllConsentsAccepted()) {
                     handlePriceLoading();
                 }
@@ -141,6 +174,14 @@ export default function Overview() {
         }
     }
 
+    function startEventListener() {
+        document.addEventListener('click', handleClickEvent);
+
+        return () => {
+            document.removeEventListener('click', handleClickEvent);
+        };
+    }
+
     useEffect(() => {
         if (!didInit.current) {
             handleConsentLoading();
@@ -155,6 +196,13 @@ export default function Overview() {
             setIsFiltered(false);
         }
     }, [selectedCities]);
+
+    useEffect(() => {
+        if (prevConsentRef.current !== isAllConsentsAccepted) {
+            location.reload();
+        }
+        prevConsentRef.current = isAllConsentsAccepted;
+    }, [isAllConsentsAccepted]);
 
     // sorting of stations by price (selected fuel button)
     sortedFuelStations = fuelStations
@@ -212,7 +260,7 @@ export default function Overview() {
                             <Footer updated={lastUpdate} openModal={openModal} />
                         </>
                     ) : (
-                        <Spinner />
+                        <Spinner isAllConsentsAccepted={isAllConsentsAccepted} />
                     )}
                 </section>
             </main>
