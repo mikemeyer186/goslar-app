@@ -137,18 +137,16 @@ exports.fetchFuelPrices = functions
                     .replace(/(\d+,\d{2})\d*/, '$1');
             };
 
-            const description = `E5: von ${formatPrice(minE5)}€ bis ${formatPrice(maxE5)}€
-            E10: von ${formatPrice(minE10)}€ bis ${formatPrice(maxE10)}€
-            Diesel: von ${formatPrice(minDiesel)}€ bis ${formatPrice(maxDiesel)}€`;
+            const description = `E5: von ${formatPrice(minE5)}€ bis ${formatPrice(maxE5)}€\nE10: von ${formatPrice(minE10)}€ bis ${formatPrice(
+                maxE10
+            )}€\nDiesel: von ${formatPrice(minDiesel)}€ bis ${formatPrice(maxDiesel)}€`;
 
             const widgetData = {
                 title: 'Aktuelle Preise',
                 description: description,
-                image_url: '',
-                action: {
-                    type: 'link',
-                    url: 'https://tanken-in-goslar.de?externalconsent=true',
-                },
+                image_url: 'https://tanken-in-goslar.de/assets/images/station.webp',
+                call_to_action_url: 'https://tanken-in-goslar.de?externalconsent=true',
+                published_at: new Date().toISOString(),
             };
 
             // creating historic station object
