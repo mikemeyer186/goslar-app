@@ -137,9 +137,9 @@ exports.fetchFuelPrices = functions
                     .replace(/(\d+,\d{2})\d*/, '$1');
             };
 
-            const description = `E5: von ${formatPrice(minE5)}€ bis ${formatPrice(maxE5)}€\nE10: von ${formatPrice(minE10)}€ bis ${formatPrice(
+            const description = `E5: ${formatPrice(minE5)}€ - ${formatPrice(maxE5)}€\nE10: ${formatPrice(minE10)}€ - ${formatPrice(
                 maxE10
-            )}€\nDiesel: von ${formatPrice(minDiesel)}€ bis ${formatPrice(maxDiesel)}€`;
+            )}€\nDiesel: ${formatPrice(minDiesel)}€ - ${formatPrice(maxDiesel)}€`;
 
             const widgetData = {
                 title: 'Aktuelle Preise',
