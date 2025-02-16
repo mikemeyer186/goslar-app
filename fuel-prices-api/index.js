@@ -131,6 +131,40 @@ app.get('/widget1', async (req, res) => {
     }
 });
 
+app.get('/widget2', async (req, res) => {
+    try {
+        const currentDocRef = db.collection('fuel_prices').doc('widget2');
+        const doc = await currentDocRef.get();
+
+        if (!doc.exists) {
+            return res.status(404).json({ error: 'No widget data found!' });
+        }
+
+        const data = doc.data();
+        return res.status(200).json(data);
+    } catch (error) {
+        console.error('Error while requesting widget data:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+app.get('/widget3', async (req, res) => {
+    try {
+        const currentDocRef = db.collection('fuel_prices').doc('widget3');
+        const doc = await currentDocRef.get();
+
+        if (!doc.exists) {
+            return res.status(404).json({ error: 'No widget data found!' });
+        }
+
+        const data = doc.data();
+        return res.status(200).json(data);
+    } catch (error) {
+        console.error('Error while requesting widget data:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
 // Endpoint: /historic
 app.get('/historic', async (req, res) => {
     try {
