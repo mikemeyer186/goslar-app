@@ -1,27 +1,32 @@
-const functions = require('firebase-functions');
+const { onMessagePublished } = require('firebase-functions/v2/pubsub');
 const axios = require('axios');
 const admin = require('./firebase_admin');
 const cities = require('./cities.json');
 
 const db = admin.firestore();
 
-exports.fetchFuelPrices = functions
-    .region('europe-west3')
-    .pubsub.topic('firebase-schedule-fetchFuelPrices-europe-west3')
-    .onPublish(async (message) => {
+exports.fetchFuelPrices = onMessagePublished(
+    {
+        region: 'europe-west3',
+        topic: 'firebase-schedule-fetchFuelPrices-europe-west3',
+    },
+    async (message) => {
         try {
-            const data = message.json || {};
-            const action = data.trigger;
+            const pubsubMessage = message.data.message;
+            const decodedData = pubsubMessage.data
+                ? JSON.parse(Buffer.from(pubsubMessage.data, 'base64').toString())
+                : {};
+            const action = decodedData.trigger;
 
             if (action !== 'scheduled_fetch') {
                 console.log('Unexpected action:', action);
                 return;
             }
 
-            const apiKey = functions.config().tanker.api_key;
-            const urlSection_1 = functions.config().tanker.api_url_1;
-            const urlRadius = functions.config().tanker.api_radius;
-            const urlSection_2 = functions.config().tanker.api_url_2;
+            const apiKey = process.env.TANKER_API_KEY;
+            const urlSection_1 = process.env.TANKER_API_URL_1;
+            const urlRadius = process.env.TANKER_API_RADIUS;
+            const urlSection_2 = process.env.TANKER_API_URL_2;
             const apiUrl = urlSection_1 + urlRadius + urlSection_2 + apiKey;
             const postalCodes = cities.flatMap((city) => city.codes);
 
@@ -47,9 +52,9 @@ exports.fetchFuelPrices = functions
             let historicStations = [];
 
             // filtering the cheapest stations
-            const cheapestDiesel = filteredStations.sort((a, b) => a.diesel - b.diesel).filter((station) => station.diesel != null && station.isOpen);
-            const cheapestE5 = filteredStations.sort((a, b) => a.e5 - b.e5).filter((station) => station.e5 != null && station.isOpen);
-            const cheapestE10 = filteredStations.sort((a, b) => a.e10 - b.e10).filter((station) => station.e10 != null && station.isOpen);
+            const cheapestDiesel = [...filteredStations].sort((a, b) => a.diesel - b.diesel).filter((station) => station.diesel != null && station.isOpen);
+            const cheapestE5 = [...filteredStations].sort((a, b) => a.e5 - b.e5).filter((station) => station.e5 != null && station.isOpen);
+            const cheapestE10 = [...filteredStations].sort((a, b) => a.e10 - b.e10).filter((station) => station.e10 != null && station.isOpen);
 
             const cheapestStations = {
                 diesel: cheapestDiesel[0],
@@ -201,9 +206,11 @@ exports.fetchFuelPrices = functions
             const historicDocRefIso = db.collection('fuel_prices').doc('historic').collection('iso_timestamps');
             await historicDocRefIso.doc(isoTimestamp).set({ data: historicStations });
 
-            filteredStations.forEach(async (station) => {
-                const stationDocRef = await db.collection('fuel_prices').doc(station.id).set(station);
-            });
+            const stationWrites = [];
+            for (const station of filteredStations) {
+                stationWrites.push(db.collection('fuel_prices').doc(station.id).set(station));
+            }
+            await Promise.all(stationWrites);
 
             await db.collection('fuel_prices').doc('widget1').set(widgetData1);
             await db.collection('fuel_prices').doc('widget2').set(widgetData2);
