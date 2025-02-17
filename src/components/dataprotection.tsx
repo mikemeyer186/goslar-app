@@ -20,7 +20,7 @@ export default function DataProtection({ closeModal }: DatProTileProps) {
         <div className="datpro-modal">
             <div className="scroll-container">
                 <div className="close-icon" onClick={() => closeModal('datpro')}>
-                    Zurück
+                    zurück
                 </div>
 
                 <div className="datpro-container">
