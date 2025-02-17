@@ -9,7 +9,7 @@ export default function Spinner({ isAllConsentsAccepted }: SpinnerProps) {
     const spinnerMessage =
         isAllConsentsAccepted || searchParams.get('externalconsent')
             ? ''
-            : 'Um die Website nutzen zu können, musst du die funktionellen Cookies akzeptieren';
+            : 'Um diese Website nutzen zu können, musst du die funktionellen Cookies akzeptieren';
 
     return (
         <div className="spinner">

@@ -20,7 +20,7 @@ export default function Imprint({ closeModal }: ImprintTileProps) {
         <div className="imprint-modal">
             <div className="scroll-container">
                 <div className="close-icon" onClick={() => closeModal('imprint')}>
-                    Schließen
+                    Zurück
                 </div>
 
                 <div className="imprint-container">

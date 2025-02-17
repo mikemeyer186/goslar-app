@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { loadCurrentFuelPrices, loadHistoricFuelPrices } from '../services/firebase';
+import { loadCurrentFuelPrices } from '../services/firebase';
 import { useSearchParams } from 'react-router-dom';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import Station from '../interfaces/station';
-import HistoricData from '../interfaces/historic-data';
-import HistoricPrices from '../interfaces/historic-prices';
 import TileStation from './stationTile';
 import Toolbar from './toolbar';
 import Spinner from './spinner';
@@ -16,8 +14,6 @@ import Disclaimer from './disclaimer';
 export default function Overview() {
     const [itemParent] = useAutoAnimate({ duration: 150, easing: 'ease-in' });
     const [fuelStations, setFuelStations] = useState<Station[]>([]);
-    const [historicPrices1Day, setHistoricPrices1Day] = useState<HistoricPrices[]>([]);
-    const [historicPrices7Days, setHistoricPrices7Days] = useState<HistoricPrices[]>([]);
     const [lastUpdate, setLastUpdate] = useState<string>('');
     const [isLoaded, setIsLoaded] = useState(false);
     const [activeSelection, setActiveSelection] = useState<FuelSelection>('diesel');
@@ -34,6 +30,10 @@ export default function Overview() {
     let filteredFuelStations: Station[] = [];
     type FuelSelection = 'e5' | 'e10' | 'diesel';
 
+    /**
+     * checks if all services of usercentrics are accepted
+     * and sets the state on initial loading
+     */
     const [isAllConsentsAccepted, setAllConsentsAccepted] = useState<boolean>(() => {
         const ucData = localStorage.getItem('uc_settings');
         if (ucData) {
@@ -49,6 +49,12 @@ export default function Overview() {
     });
     const prevConsentRef = useRef(isAllConsentsAccepted);
 
+    /**
+     * handles the click event on usercentrics consent banner
+     * checks on every click if all services of usercentrics are accepted
+     * the timeout of 1000 ms is necessary to avoid write/read gap
+     * @param e - event
+     */
     function handleClickEvent(e: MouseEvent) {
         const eventPath = e.composedPath();
         const bannerClicked = eventPath.some((node) => node instanceof HTMLElement && node.id === 'uc-center-container');
@@ -67,6 +73,10 @@ export default function Overview() {
         }
     }
 
+    /**
+     * starts the click event listener on initial loading
+     * @returns - unsubscribe
+     */
     function startEventListener() {
         document.addEventListener('click', handleClickEvent);
 
@@ -75,9 +85,18 @@ export default function Overview() {
         };
     }
 
+    /**
+     * checks the url parameters and loads usercentrics banner
+     * if user comes from goslar-app, no banner will be loaded
+     */
     async function handleConsentLoading() {
-        const params = searchParams.get('externalconsent');
-        if (!params) {
+        const externalConsentParam = searchParams.get('externalconsent');
+        const originParam = searchParams.get('origin');
+        const originKey = import.meta.env.VITE_URL_PARAMETER_ORIGIN;
+
+        if (externalConsentParam && originParam === originKey) {
+            handlePriceLoading();
+        } else {
             await handleConsentBannerLoad();
             window.addEventListener('UC_UI_INITIALIZED', function () {
                 startEventListener();
@@ -85,11 +104,12 @@ export default function Overview() {
                     handlePriceLoading();
                 }
             });
-        } else {
-            handlePriceLoading();
         }
     }
 
+    /**
+     * loads the usercentrics banner via script by adding to document head
+     */
     async function handleConsentBannerLoad() {
         const script = document.createElement('script');
         script.id = 'usercentrics-cmp';
@@ -100,58 +120,29 @@ export default function Overview() {
         document.head.appendChild(script);
     }
 
+    /**
+     * loads the current prices from firestore
+     */
     async function handlePriceLoading() {
         const stationsData = await loadCurrentFuelPrices();
-        const historicData = await loadHistoricFuelPrices();
-
         setFuelStations(stationsData?.data);
         setLastUpdate(stationsData?.updated);
-        handleHistoricDataFiltering(historicData as HistoricData, stationsData?.updated);
         setTimeout(() => {
             setIsLoaded(true);
         }, 1500);
     }
 
-    function handleHistoricDataFiltering(historicData: HistoricData, updated: string) {
-        const parsedTimestamp = parseTimestamp(updated);
-        const timestamp1DayBack: string = new Date(parsedTimestamp.setDate(parsedTimestamp.getDate() - 1)).toLocaleString('de-DE', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            timeZone: 'Europe/Berlin',
-        });
-        const timestamp7DaysBack: string = new Date(parsedTimestamp.setDate(parsedTimestamp.getDate() - 7)).toLocaleString('de-DE', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            timeZone: 'Europe/Berlin',
-        });
-
-        setHistoricPrices1Day(historicData[timestamp1DayBack]);
-        setHistoricPrices7Days(historicData[timestamp7DaysBack]);
-    }
-
+    /**
+     * sets the selected fuel type
+     * @param selection - fuel type
+     */
     function onFuelSelection(selection: FuelSelection) {
         setActiveSelection(selection);
     }
 
-    function parseTimestamp(dateString: string) {
-        const [datePart, timePart] = dateString.split(', ');
-        const [dayStr, monthStr, yearStr] = datePart.split('.');
-        const [hoursStr, minutesStr] = timePart.split(':');
-        const day = parseInt(dayStr, 10);
-        const month = parseInt(monthStr, 10);
-        const year = parseInt(yearStr, 10);
-        const hours = parseInt(hoursStr, 10);
-        const minutes = parseInt(minutesStr, 10);
-        const date = new Date(year, month - 1, day, hours, minutes);
-        return date;
-    }
-
+    /**
+     * sets the station filter (open/closed)
+     */
     function onSliderMove() {
         if (showOnlyOpenStations) {
             setShowOnlyOpenStations(false);
@@ -160,6 +151,10 @@ export default function Overview() {
         }
     }
 
+    /**
+     * opens the modal from footer links
+     * @param modal - model as string
+     */
     function openModal(modal: string) {
         document.body.classList.add('overflow-hidden');
         if (modal === 'imprint') {
@@ -171,6 +166,10 @@ export default function Overview() {
         }
     }
 
+    /**
+     * closes the modal
+     * @param modal - modal as string
+     */
     function closeModal(modal: string) {
         document.body.classList.remove('overflow-hidden');
         if (modal === 'imprint') {
@@ -182,6 +181,9 @@ export default function Overview() {
         }
     }
 
+    /**
+     * inital loading of component
+     */
     useEffect(() => {
         if (!didInit.current) {
             handleConsentLoading();
@@ -189,6 +191,9 @@ export default function Overview() {
         }
     }, []);
 
+    /**
+     * sets the filter status
+     */
     useEffect(() => {
         if (selectedCities.length > 0) {
             setIsFiltered(true);
@@ -197,6 +202,9 @@ export default function Overview() {
         }
     }, [selectedCities]);
 
+    /**
+     * checks if the user changed consent accept and reloads the page
+     */
     useEffect(() => {
         if (prevConsentRef.current !== isAllConsentsAccepted) {
             location.reload();
@@ -245,15 +253,7 @@ export default function Overview() {
 
                             <div className="station-wrapper" ref={itemParent}>
                                 {filteredFuelStations.map((station: Station) => {
-                                    return (
-                                        <TileStation
-                                            key={station.id}
-                                            station={station}
-                                            activeSelection={activeSelection}
-                                            prices1Day={historicPrices1Day.find((prices) => prices.id === station.id)}
-                                            prices7Days={historicPrices7Days.find((prices) => prices.id === station.id)}
-                                        />
-                                    );
+                                    return <TileStation key={station.id} station={station} activeSelection={activeSelection} />;
                                 })}
                             </div>
 

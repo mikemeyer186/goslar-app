@@ -6,7 +6,7 @@ export default function Disclaimer({ closeModal }: ImprintTileProps) {
     return (
         <div className="scroll-container">
             <div className="close-icon" onClick={() => closeModal('disclaimer')}>
-                Schließen
+                Zurück
             </div>
 
             <div className="disclaimer-container">

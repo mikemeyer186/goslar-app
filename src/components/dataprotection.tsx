@@ -20,7 +20,7 @@ export default function DataProtection({ closeModal }: DatProTileProps) {
         <div className="datpro-modal">
             <div className="scroll-container">
                 <div className="close-icon" onClick={() => closeModal('datpro')}>
-                    Schließen
+                    Zurück
                 </div>
 
                 <div className="datpro-container">
@@ -101,7 +101,7 @@ export default function DataProtection({ closeModal }: DatProTileProps) {
                         Barrow Street, Dublin, Irland. Konkret verwenden wir den Datenbankdienst Firestore, um Inhalte (z. B. aktualisierte
                         Kraftstoffpreise) in Echtzeit auf unserer Website bereitstellen zu können. Wir nutzen Firestore ausschließlich, um Inhalte
                         unserer Website aktuell anzuzeigen und für eine reibungslose Funktionalität zu sorgen.
-                        <strong>Analyse- oder Tracking-Funktionen von Google (z. B. Analytics) kommen nicht zum Einsatz.</strong>
+                        <strong> Analyse- oder Tracking-Funktionen von Google (z. B. Analytics) kommen nicht zum Einsatz.</strong>
                     </p>
                     <p>
                         Die Speicherung und Verarbeitung von Daten in Firestore erfolgt auf Grundlage unseres berechtigten Interesses (Art. 6 Abs. 1

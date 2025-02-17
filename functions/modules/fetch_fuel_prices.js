@@ -146,7 +146,7 @@ exports.fetchFuelPrices = functions
                 title: 'Aktuelle Preisspanne',
                 description: description1,
                 image_url: 'https://tanken-in-goslar.de/assets/images/goslar-app_logo_2.png',
-                call_to_action_url: 'https://tanken-in-goslar.de?externalconsent=true',
+                call_to_action_url: 'https://tanken-in-goslar.de/?externalconsent=true&origin=17cebb711379cd4836cf3f75c5044b4e4ecd6365378eacdaae0be1c3ade430cb',
                 published_at: isoTimestamp,
             };
 
@@ -157,18 +157,18 @@ exports.fetchFuelPrices = functions
                 title: 'Aktuelle Durchschnittspreise',
                 description: description2,
                 image_url: 'https://tanken-in-goslar.de/assets/images/goslar-app_logo_2.png',
-                call_to_action_url: 'https://tanken-in-goslar.de?externalconsent=true',
+                call_to_action_url: 'https://tanken-in-goslar.de/?externalconsent=true&origin=17cebb711379cd4836cf3f75c5044b4e4ecd6365378eacdaae0be1c3ade430cb',
                 published_at: isoTimestamp,
             };
 
             // widget 3
-            const description3 = `E5: ${formatPrice(cheapestStations.e5.e5)}€ - ${cheapestStations.e5.name}\nE10: ${formatPrice(cheapestStations.e10.e10)}€ - ${cheapestStations.e10.name}\nDiesel: ${formatPrice(cheapestStations.diesel.diesel)}€ - ${cheapestStations.diesel.name}`;
+            const description3 = `E5: ${formatPrice(cheapestStations.e5.e5)}€ - ${cheapestStations.e5.brand}, ${cheapestStations.e5.place}\nE10: ${formatPrice(cheapestStations.e10.e10)}€ - ${cheapestStations.e10.brand}, ${cheapestStations.e10.place}\nDiesel: ${formatPrice(cheapestStations.diesel.diesel)}€ - ${cheapestStations.diesel.brand}, ${cheapestStations.diesel.place}`;
 
             const widgetData3 = {
                 title: 'Günstigste Tankstellen',
                 description: description3,
                 image_url: '',
-                call_to_action_url: 'https://tanken-in-goslar.de?externalconsent=true',
+                call_to_action_url: 'https://tanken-in-goslar.de/?externalconsent=true&origin=17cebb711379cd4836cf3f75c5044b4e4ecd6365378eacdaae0be1c3ade430cb',
                 published_at: isoTimestamp,
             };
 
