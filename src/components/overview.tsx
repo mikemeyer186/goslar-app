@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { loadCurrentFuelPrices } from '../services/firebase';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import Station from '../interfaces/station';
 import TileStation from './stationTile';
@@ -13,6 +13,7 @@ import Disclaimer from './disclaimer';
 
 export default function Overview() {
     const [itemParent] = useAutoAnimate({ duration: 150, easing: 'ease-in' });
+    const [searchParams] = useSearchParams('');
     const [fuelStations, setFuelStations] = useState<Station[]>([]);
     const [lastUpdate, setLastUpdate] = useState<string>('');
     const [isLoaded, setIsLoaded] = useState(false);
@@ -20,10 +21,10 @@ export default function Overview() {
     const [showOnlyOpenStations, setShowOnlyOpenStations] = useState(true);
     const [selectedCities, setSelectedCities] = useState<string[]>([]);
     const [isFiltered, setIsFiltered] = useState<boolean>(false);
-    const [isImprintOpen, setIsImprintOpen] = useState(false);
-    const [isDatProOpen, setIsDatProOpen] = useState(false);
+    const [isImprintOpen, setIsImprintOpen] = useState(searchParams.get('target') === 'imprint' ? true : false);
+    const [isDatProOpen, setIsDatProOpen] = useState(searchParams.get('target') === 'dataprotection' ? true : false);
     const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
-    const [searchParams] = useSearchParams('');
+    const navigate = useNavigate();
     const didInit = useRef(false);
     let sortedFuelStations: Station[] = [];
     let openStations: Station[] = [];
@@ -174,10 +175,15 @@ export default function Overview() {
         document.body.classList.remove('overflow-hidden');
         if (modal === 'imprint') {
             setIsImprintOpen(false);
+            navigate('/');
+            location.reload();
         } else if (modal === 'datpro') {
             setIsDatProOpen(false);
+            navigate('/');
+            location.reload();
         } else if (modal === 'disclaimer') {
             setIsDisclaimerOpen(false);
+            navigate('/');
         }
     }
 
