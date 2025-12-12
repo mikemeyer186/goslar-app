@@ -151,7 +151,7 @@ exports.fetchFuelPrices = onMessagePublished(
                 title: 'Aktuelle Preisspanne',
                 description: description1,
                 image_url: 'https://tanken-in-goslar.de/assets/images/goslar-app_logo_2.png',
-                call_to_action_url: 'https://tanken-in-goslar.de/?externalconsent=true&origin=17cebb711379cd4836cf3f75c5044b4e4ecd6365378eacdaae0be1c3ade430cb',
+                call_to_action_url: 'https://tanken-in-goslar.de/',
                 published_at: isoTimestamp,
             };
 
@@ -162,7 +162,7 @@ exports.fetchFuelPrices = onMessagePublished(
                 title: 'Aktuelle Durchschnittspreise',
                 description: description2,
                 image_url: 'https://tanken-in-goslar.de/assets/images/goslar-app_logo_2.png',
-                call_to_action_url: 'https://tanken-in-goslar.de/?externalconsent=true&origin=17cebb711379cd4836cf3f75c5044b4e4ecd6365378eacdaae0be1c3ade430cb',
+                call_to_action_url: 'https://tanken-in-goslar.de/',
                 published_at: isoTimestamp,
             };
 
@@ -173,7 +173,7 @@ exports.fetchFuelPrices = onMessagePublished(
                 title: 'Günstigste Tankstellen',
                 description: description3,
                 image_url: '',
-                call_to_action_url: 'https://tanken-in-goslar.de/?externalconsent=true&origin=17cebb711379cd4836cf3f75c5044b4e4ecd6365378eacdaae0be1c3ade430cb',
+                call_to_action_url: 'https://tanken-in-goslar.de/',
                 published_at: isoTimestamp,
             };
 
