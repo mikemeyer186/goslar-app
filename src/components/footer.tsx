@@ -27,7 +27,7 @@ export default function Footer({ updated, openModal }: StationTileProps) {
                 </span>
             </div>
 
-            <span>© 2025</span>
+            <span>© 2026</span>
 
             <div className="footer-links">
                 <a
