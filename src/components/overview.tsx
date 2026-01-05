@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { loadCurrentFuelPrices } from '../services/firebase';
+import { loadCurrentFuelPrices, loadDailyAverages } from '../services/firebase';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import Station from '../interfaces/station';
@@ -126,6 +126,8 @@ export default function Overview() {
      */
     async function handlePriceLoading() {
         const stationsData = await loadCurrentFuelPrices();
+        const dailyAverages = await loadDailyAverages();
+        console.log(dailyAverages);
         setFuelStations(stationsData?.data);
         setLastUpdate(stationsData?.updated);
         setTimeout(() => {

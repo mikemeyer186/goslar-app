@@ -200,9 +200,6 @@ exports.fetchFuelPrices = onMessagePublished(
                 data: cheapestStations,
             });
 
-            const historicDocRef = db.collection('fuel_prices').doc('historic').collection('timestamps');
-            await historicDocRef.doc(localStringTimestamp).set({ data: historicStations });
-
             const historicDocRefIso = db.collection('fuel_prices').doc('historic').collection('iso_timestamps');
             await historicDocRefIso.doc(isoTimestamp).set({ data: historicStations });
 

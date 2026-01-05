@@ -1,7 +1,5 @@
-import { collection, doc, getDoc, getDocs, limit, orderBy, query } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { db } from '../configs/firebase';
-import HistoricPrices from '../interfaces/historic-prices';
-import HistoricData from '../interfaces/historic-data';
 
 export async function loadCurrentFuelPrices() {
     const docRef = doc(db, 'fuel_prices', 'all');
@@ -14,22 +12,20 @@ export async function loadCurrentFuelPrices() {
     }
 }
 
-export async function loadHistoricFuelPrices() {
+export async function loadDailyAverages() {
     try {
-        const timestamps = collection(db, 'fuel_prices', 'historic', 'timestamps');
-        const q = query(timestamps, orderBy('__name__', 'desc'), limit(5000));
-        const snapshot = await getDocs(q);
-        const data: HistoricData = {};
+        const dailyAverages = collection(db, 'fuel_prices', 'historic', 'daily_average');
+        const snapshot = await getDocs(dailyAverages);
+        const data: object[] = [];
 
         if (!snapshot.empty) {
             snapshot.forEach((doc) => {
                 const docData = doc.data();
-                data[doc.id] = docData.data as HistoricPrices[];
+                data.push(docData);
             });
         } else {
             console.log('No fuel prices found!');
         }
-        console.log(Object.keys(data).length);
 
         return data;
     } catch (error) {
