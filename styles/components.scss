@@ -298,20 +298,50 @@
             transition: $transition-normal;
             opacity: 0;
             padding-top: 8px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
 
-            .station-table {
-                padding-top: 16px;
-                border-spacing: 0;
-                line-height: 1.5;
-                font-size: 1.2rem;
+            .station-table-chart {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: stretch;
 
-                td {
-                    padding: 0;
+                .station-table {
+                    padding-top: 16px;
+                    border-spacing: 0;
+                    line-height: 1.5;
+                    font-size: 1.2rem;
+                    flex-shrink: 0;
+                    flex-grow: 0;
+                    margin-right: 32px;
+
+                    td {
+                        padding: 0;
+                    }
+
+                    .station-table-price {
+                        padding-left: 16px;
+                        font-weight: 500;
+                    }
                 }
 
-                .station-table-price {
-                    padding-left: 16px;
-                    font-weight: 500;
+                .station-chart {
+                    position: absolute;
+                    bottom: -15px;
+                    right: 16px;
+                    height: 132px;
+                    width: calc(100% - 179px);
+
+                    *:focus,
+                    *:focus-visible {
+                        outline: none;
+                    }
+
+                    .recharts-surface {
+                        cursor: pointer;
+                    }
                 }
             }
         }

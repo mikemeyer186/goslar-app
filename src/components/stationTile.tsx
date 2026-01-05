@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Station from '../interfaces/station';
+import PriceChart from './priceChart';
 
 interface StationTileProps {
     station: Station;
@@ -62,22 +63,28 @@ export default function StationTile({ station, activeSelection }: StationTilePro
                     {station.isOpen ? 'Die Tankstelle hat geöffnet' : 'Die Tankstelle hat zur Zeit geschlossen'}
                 </div>
 
-                <table className="station-table">
-                    <tbody>
-                        <tr>
-                            <td>Diesel:</td>
-                            <td className="station-table-price">{station.diesel ? truncatePrice(station.diesel) : '-'}</td>
-                        </tr>
-                        <tr>
-                            <td>E5:</td>
-                            <td className="station-table-price">{station.e5 ? truncatePrice(station.e5) : '-'}</td>
-                        </tr>
-                        <tr>
-                            <td>E10:</td>
-                            <td className="station-table-price">{station.e10 ? truncatePrice(station.e10) : '-'}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div className="station-table-chart">
+                    <table className="station-table">
+                        <tbody>
+                            <tr>
+                                <td>Diesel:</td>
+                                <td className="station-table-price">{station.diesel ? truncatePrice(station.diesel) : '-'}</td>
+                            </tr>
+                            <tr>
+                                <td>E5:</td>
+                                <td className="station-table-price">{station.e5 ? truncatePrice(station.e5) : '-'}</td>
+                            </tr>
+                            <tr>
+                                <td>E10:</td>
+                                <td className="station-table-price">{station.e10 ? truncatePrice(station.e10) : '-'}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div className="station-chart">
+                        <PriceChart />
+                    </div>
+                </div>
             </div>
         </section>
     );
