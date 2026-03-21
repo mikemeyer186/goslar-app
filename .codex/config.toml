@@ -1,0 +1,13 @@
+# Project-specific Codex settings
+
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+allow_login_shell = false
+
+[sandbox_workspace_write]
+network_access = false
+writable_roots = []
+
+# Let Codex discover project guidance files reliably
+project_doc_fallback_filenames = ["AGENTS.md"]
+project_doc_max_bytes = 65536
