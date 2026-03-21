@@ -3,6 +3,7 @@ import { loadCurrentFuelPrices, loadDailyAverages } from '../services/firebase';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import Station from '../interfaces/station';
+import { DailyAverageRecord, FuelSelection, StationPriceHistoryPoint } from '../interfaces/dailyAverage';
 import TileStation from './stationTile';
 import Toolbar from './toolbar';
 import Spinner from './spinner';
@@ -11,10 +12,40 @@ import Imprint from './imprint';
 import DataProtection from './dataprotection';
 import Disclaimer from './disclaimer';
 
+function formatHistoryLabel(day: string) {
+    const [, month, dayOfMonth] = day.split('-');
+    return `${dayOfMonth}.${month}.`;
+}
+
+function buildStationPriceHistory(records: DailyAverageRecord[]) {
+    const latestRecords = records
+        .slice()
+        .sort((a, b) => a.day.localeCompare(b.day))
+        .slice(-30);
+    const stationIds = Array.from(new Set(latestRecords.flatMap((record) => Object.keys(record.stations ?? {}))));
+
+    return stationIds.reduce<Record<string, StationPriceHistoryPoint[]>>((historyByStation, stationId) => {
+        historyByStation[stationId] = latestRecords.map((record) => {
+            const stationEntry = record.stations?.[stationId];
+
+            return {
+                day: record.day,
+                label: formatHistoryLabel(record.day),
+                diesel: stationEntry?.average.diesel ?? null,
+                e5: stationEntry?.average.e5 ?? null,
+                e10: stationEntry?.average.e10 ?? null,
+            };
+        });
+
+        return historyByStation;
+    }, {});
+}
+
 export default function Overview() {
     const [itemParent] = useAutoAnimate({ duration: 150, easing: 'ease-in' });
     const [searchParams] = useSearchParams('');
     const [fuelStations, setFuelStations] = useState<Station[]>([]);
+    const [stationPriceHistory, setStationPriceHistory] = useState<Record<string, StationPriceHistoryPoint[]>>({});
     const [lastUpdate, setLastUpdate] = useState<string>('');
     const [isLoaded, setIsLoaded] = useState(false);
     const [activeSelection, setActiveSelection] = useState<FuelSelection>('diesel');
@@ -29,7 +60,6 @@ export default function Overview() {
     let sortedFuelStations: Station[] = [];
     let openStations: Station[] = [];
     let filteredFuelStations: Station[] = [];
-    type FuelSelection = 'e5' | 'e10' | 'diesel';
 
     /**
      * checks if all services of usercentrics are accepted
@@ -126,10 +156,10 @@ export default function Overview() {
      */
     async function handlePriceLoading() {
         const stationsData = await loadCurrentFuelPrices();
-        const dailyAverages = await loadDailyAverages();
-        console.log(dailyAverages);
-        setFuelStations(stationsData?.data);
-        setLastUpdate(stationsData?.updated);
+        const dailyAverages = (await loadDailyAverages()) as DailyAverageRecord[] | undefined;
+        setFuelStations(stationsData?.data ?? []);
+        setStationPriceHistory(buildStationPriceHistory(dailyAverages ?? []));
+        setLastUpdate(stationsData?.updated ?? '');
         setTimeout(() => {
             setIsLoaded(true);
         }, 1500);
@@ -250,7 +280,14 @@ export default function Overview() {
 
                             <div className="station-wrapper" ref={itemParent}>
                                 {filteredFuelStations.map((station: Station) => {
-                                    return <TileStation key={station.id} station={station} activeSelection={activeSelection} />;
+                                    return (
+                                        <TileStation
+                                            key={station.id}
+                                            station={station}
+                                            activeSelection={activeSelection}
+                                            priceHistory={stationPriceHistory[station.id] ?? []}
+                                        />
+                                    );
                                 })}
                             </div>
 
