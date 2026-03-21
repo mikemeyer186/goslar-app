@@ -8,4 +8,7 @@ export default defineConfig({
     server: {
         port: 4200,
     },
+    build: {
+        chunkSizeWarningLimit: 1000,
+  },
 });

@@ -20,7 +20,7 @@ export default function Overview() {
     const [activeSelection, setActiveSelection] = useState<FuelSelection>('diesel');
     const [showOnlyOpenStations, setShowOnlyOpenStations] = useState(true);
     const [selectedCities, setSelectedCities] = useState<string[]>([]);
-    const [isFiltered, setIsFiltered] = useState<boolean>(false);
+    const isFiltered = selectedCities.length > 0;
     const [isImprintOpen, setIsImprintOpen] = useState(searchParams.get('target') === 'imprint' ? true : false);
     const [isDatProOpen, setIsDatProOpen] = useState(searchParams.get('target') === 'dataprotection' ? true : false);
     const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
@@ -200,17 +200,6 @@ export default function Overview() {
     }, []);
 
     /**
-     * sets the filter status
-     */
-    useEffect(() => {
-        if (selectedCities.length > 0) {
-            setIsFiltered(true);
-        } else {
-            setIsFiltered(false);
-        }
-    }, [selectedCities]);
-
-    /**
      * checks if the user changed consent accept and reloads the page
      */
     useEffect(() => {
@@ -236,7 +225,7 @@ export default function Overview() {
     // filters selected stations by cities (filter menu)
     if (isFiltered) {
         filteredFuelStations = openStations.filter((station: Station) =>
-            selectedCities.some((city) => station.place.toLowerCase().includes(city.toLowerCase()))
+            selectedCities.some((city) => station.place.toLowerCase().includes(city.toLowerCase())),
         );
     } else {
         filteredFuelStations = openStations;

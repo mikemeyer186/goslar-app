@@ -1,6 +1,6 @@
-@import 'fonts.scss';
-@import 'variables.scss';
-@import 'components.scss';
+@use 'fonts';
+@use 'variables' as *;
+@use 'components';
 
 * {
     box-sizing: border-box;

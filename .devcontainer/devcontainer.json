@@ -1,0 +1,80 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
+{
+    "name": "Node.js & TypeScript",
+    // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+    "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+
+    // Features to add to the dev container. More info: https://containers.dev/features.
+    // "features": {},
+
+    // Use 'forwardPorts' to make a list of ports inside the container available locally.
+    // "forwardPorts": [],
+
+    // Use 'postCreateCommand' to run commands after the container is created.
+    // "postCreateCommand": "yarn install",
+
+    // Configure tool-specific properties.
+    // "customizations": {},
+
+    // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+    // "remoteUser": "root"
+
+    // Forward ports for development
+    "forwardPorts": [
+        4200 // Vite dev server (React app)
+        // 9099, // Firebase Auth emulator
+        // 8080, // Firestore emulator
+        // 5001 // Cloud Functions emulator
+    ],
+
+    // Map ports to user/app - prevents address already in use
+    "portsAttributes": {
+        "4200": {
+            "label": "Vite (React App)",
+            "onAutoForward": "notify"
+        }
+        // "9099": {
+        //     "label": "Firebase Auth Emulator",
+        //     "onAutoForward": "notify"
+        // },
+        // "8080": {
+        //     "label": "Firestore Emulator",
+        //     "onAutoForward": "notify"
+        // },
+        // "5001": {
+        //     "label": "Cloud Functions Emulator",
+        //     "onAutoForward": "notify"
+        // }
+    },
+
+    // Install dependencies after container creation
+    "postCreateCommand": "npm install && npm --prefix functions install",
+
+    // VS Code extensions for your stack
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "esbenp.prettier-vscode",
+                "dbaeumer.vscode-eslint",
+                "Firebase.firebase",
+                "dsznajder.es7-react-js-snippets",
+                "rangav.vscode-thunder-client",
+                "openai.chatgpt"
+            ],
+            "settings": {
+                "editor.formatOnSave": true,
+                "editor.defaultFormatter": "esbenp.prettier-vscode",
+                "[javascript]": {
+                    "editor.defaultFormatter": "esbenp.prettier-vscode"
+                },
+                "[typescript]": {
+                    "editor.defaultFormatter": "esbenp.prettier-vscode"
+                },
+                "[typescriptreact]": {
+                    "editor.defaultFormatter": "esbenp.prettier-vscode"
+                }
+            }
+        }
+    }
+}
