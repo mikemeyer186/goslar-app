@@ -44,6 +44,20 @@ Prioritize correctness, maintainability, and explicit reasoning over speed.
 - Do not leave TODOs as a substitute for completing essential logic.
 - Do not disable rules without explaining why in code comments.
 
+## UI/UX principles
+
+Treat UI quality as part of product quality.
+
+- Build modern, polished, and visually consistent interfaces.
+- Follow existing design tokens, color codes, component patterns, and visual guidelines when they already exist in the project.
+- Keep spacing consistent across the UI, including margins, padding, gaps, borders, border radius, and shadows.
+- Use consistent typography with appropriate font sizes and weights.
+- Do not use italic text unless it is explicitly required by the existing design system or content semantics.
+- Design mobile-first and ensure layouts remain usable down to a minimum viewport width of 280px.
+- Prefer responsive layouts that adapt cleanly across small, medium, and large screens.
+- Preserve visual hierarchy, readability, accessibility, and clear interaction states.
+- Avoid ad-hoc styling that breaks consistency with the rest of the application.
+
 ## Testing requirements
 
 For every non-trivial change:
