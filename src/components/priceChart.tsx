@@ -12,6 +12,33 @@ const lineConfig = {
     e10: { color: '#ef6c3d', label: 'E10' },
 } as const;
 
+const X_AXIS_TICK_COUNT = 6;
+const Y_AXIS_TICK_COUNT = 5;
+
+function clamp(value: number, min: number, max: number) {
+    return Math.min(Math.max(value, min), max);
+}
+
+function roundTick(value: number, precision: number) {
+    return Number(value.toFixed(precision));
+}
+
+function createLinearTicks(start: number, end: number, count: number, precision: number) {
+    if (count <= 1 || start === end) {
+        return [roundTick(start, precision)];
+    }
+
+    const step = (end - start) / (count - 1);
+
+    return Array.from({ length: count }, (_, index) => {
+        if (index === count - 1) {
+            return roundTick(end, precision);
+        }
+
+        return roundTick(start + step * index, precision);
+    });
+}
+
 function formatPrice(value: number | null) {
     if (value === null || Number.isNaN(value)) {
         return '-';
@@ -25,9 +52,10 @@ export default function PriceChart({ data }: PriceChartProps) {
         return <div className="station-chart-empty">Noch keine 30-Tage-Preisdaten verfügbar.</div>;
     }
 
-    const tickStep = Math.max(1, Math.floor(data.length / 5));
-    const xTicks = Array.from(new Set(data.filter((_, index) => index % tickStep === 0 || index === data.length - 1).map((entry) => entry.day)));
-    const labelMap = new Map(data.map((entry) => [entry.day, entry.label]));
+    const chartData = data.map((entry, index) => ({ ...entry, index }));
+    const maxIndex = chartData.length - 1;
+    const xTickCount = Math.min(X_AXIS_TICK_COUNT, chartData.length);
+    const xTicks = createLinearTicks(0, maxIndex, xTickCount, 6);
     const values = data.flatMap((entry) => [entry.diesel, entry.e5, entry.e10]).filter((value): value is number => typeof value === 'number');
 
     if (values.length === 0) {
@@ -39,24 +67,29 @@ export default function PriceChart({ data }: PriceChartProps) {
     const padding = Math.max(0.015, (maximumValue - minimumValue) * 0.2 || 0.03);
     const lowerPadding = padding + 0.01;
     const upperPadding = padding;
+    const yTicks = createLinearTicks(minimumValue - lowerPadding, maximumValue + upperPadding, Y_AXIS_TICK_COUNT, 3);
+    const xLabelFormatter = (value: number) => chartData[clamp(Math.round(value), 0, maxIndex)]?.label ?? '';
 
     return (
         <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={data} margin={{ top: 18, right: 10, bottom: 8, left: 0 }}>
+            <LineChart data={chartData} margin={{ top: 18, right: 10, bottom: 8, left: 0 }}>
                 <CartesianGrid stroke="#00000012" strokeDasharray="3 3" vertical={false} />
                 <XAxis
-                    dataKey="day"
+                    type="number"
+                    dataKey="index"
+                    domain={[0, maxIndex]}
                     ticks={xTicks}
-                    tickFormatter={(value) => labelMap.get(value) ?? value}
+                    tickFormatter={xLabelFormatter}
                     tick={{ fontSize: 12, fill: '#5d5d5b' }}
                     tickLine={false}
                     axisLine={false}
                     tickMargin={10}
-                    minTickGap={18}
+                    allowDecimals
                     padding={{ left: 10, right: 6 }}
                 />
                 <YAxis
-                    domain={[minimumValue - lowerPadding, maximumValue + upperPadding]}
+                    domain={[yTicks[0], yTicks[yTicks.length - 1]]}
+                    ticks={yTicks}
                     tickFormatter={(value) => `${value.toFixed(2)} €`}
                     tick={{ fontSize: 12, fill: '#5d5d5b' }}
                     tickLine={false}
@@ -71,7 +104,7 @@ export default function PriceChart({ data }: PriceChartProps) {
 
                         return [formatPrice(normalizedValue), normalizedName];
                     }}
-                    labelFormatter={(value) => `Tag: ${labelMap.get(value) ?? value}`}
+                    labelFormatter={(value) => `Tag: ${xLabelFormatter(Number(value))}`}
                     contentStyle={{
                         borderRadius: '16px',
                         border: '1px solid rgba(0, 0, 0, 0.08)',

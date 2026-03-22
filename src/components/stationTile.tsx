@@ -59,15 +59,16 @@ export default function StationTile({ station, activeSelection, priceHistory }: 
                     </div>
                 </div>
 
-                {!stationClicked && <div className="station-right">{selectedPrice ? truncatePrice(selectedPrice) : 'k. A.'}</div>}
+                <div className={`station-right ${stationClicked ? 'station-right-hidden' : ''}`} aria-hidden={stationClicked}>
+                    {selectedPrice ? truncatePrice(selectedPrice) : 'k. A.'}
+                </div>
             </div>
 
             <div className={`station-large-content ${stationClicked ? 'station-large-visible' : ''}`}>
                 <div className="station-large-header">
                     <div className={`station-large-status ${station.isOpen ? 'station-large-open' : 'station-large-closed'}`}>
-                        {station.isOpen ? 'Die Tankstelle hat geoffnet' : 'Die Tankstelle ist zur Zeit geschlossen'}
+                        {station.isOpen ? 'Die Tankstelle hat geöffnet' : 'Die Tankstelle ist zur Zeit geschlossen'}
                     </div>
-                    <span className="station-large-caption">Preisverlauf der letzten 30 Tage</span>
                 </div>
 
                 <div className="station-price-overview">
@@ -83,6 +84,7 @@ export default function StationTile({ station, activeSelection, priceHistory }: 
                 </div>
 
                 <div className="station-chart">
+                    <span className="station-large-caption">Preisverlauf der letzten 30 Tage</span>
                     <PriceChart data={priceHistory} />
                 </div>
             </div>

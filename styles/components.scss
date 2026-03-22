@@ -295,6 +295,11 @@
                 line-height: 1;
                 color: $txt-color-main;
                 padding-top: 6px;
+                opacity: 1;
+                transform: translateY(0);
+                transition:
+                    opacity 180ms ease,
+                    transform 220ms ease;
 
                 @media (max-width: 348px) {
                     font-size: 1.4rem;
@@ -307,6 +312,11 @@
                 @media (max-width: 296px) {
                     font-size: 1rem;
                 }
+            }
+
+            .station-right-hidden {
+                opacity: 0;
+                pointer-events: none;
             }
         }
 
@@ -329,6 +339,9 @@
             }
 
             .station-large-caption {
+                display: block;
+                text-align: center;
+                width: 100%;
                 font-size: 0.8rem;
                 font-weight: 500;
                 color: rgba(63, 63, 62, 0.7);
@@ -339,14 +352,12 @@
                 display: grid;
                 grid-template-columns: repeat(3, minmax(0, 1fr));
                 gap: 10px;
-
-                @media (max-width: 340px) {
-                    grid-template-columns: 1fr;
-                }
             }
 
             .station-price-card {
                 display: flex;
+                justify-content: center;
+                align-items: center;
                 flex-direction: column;
                 gap: 6px;
                 padding: 12px;
@@ -355,13 +366,6 @@
                 border: 1px solid rgba(0, 0, 0, 0.06);
                 box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
             }
-
-            .station-price-card-active {
-                background-color: rgba(244, 245, 247, 0.96);
-                border-color: rgba(0, 0, 0, 0.08);
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-            }
-
             .station-price-label {
                 font-size: 0.8rem;
                 font-weight: 700;
@@ -385,11 +389,21 @@
                 font-size: 1.35rem;
                 font-weight: 700;
                 line-height: 1.1;
+
+                @media (max-width: 350px) {
+                    font-size: 1.1rem;
+                }
+
+                @media (max-width: 330px) {
+                    font-size: 1rem;
+                }
+                @media (max-width: 300px) {
+                    font-size: 0.9rem;
+                }
             }
 
             .station-chart {
-                width: calc(100% + 8px);
-                margin-left: -4px;
+                width: calc(100%);
                 padding: 16px 12px 6px 2px;
                 border-radius: 22px;
                 background: rgba(255, 255, 255, 0.88);
