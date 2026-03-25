@@ -24,8 +24,21 @@ export default function StationTile({ station, activeSelection, priceHistory }: 
         { key: 'e10', label: 'E10', value: station.e10 },
     ];
 
+    /**
+     * Toggles the station tile between its collapsed and expanded state when clicked,
+     * allowing the user to view more details and the price chart.
+     */
     function onStationClick() {
         setStationClicked((currentState) => !currentState);
+    }
+
+    /**
+     * Prevents the click event from propagating to the station tile when clicking on the chart,
+     * so that the station tile doesn't collapse when interacting with the chart.
+     * @param event - Click or tap event on the chart area
+     */
+    function onChartClick(event: React.MouseEvent<HTMLDivElement>) {
+        event.stopPropagation();
     }
 
     /**
@@ -83,7 +96,7 @@ export default function StationTile({ station, activeSelection, priceHistory }: 
                     ))}
                 </div>
 
-                <div className="station-chart">
+                <div className="station-chart" onClick={onChartClick}>
                     <span className="station-large-caption">Preisverlauf der letzten 30 Tage</span>
                     <PriceChart data={priceHistory} />
                 </div>

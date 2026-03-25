@@ -6,10 +6,14 @@ interface PriceChartProps {
     data: StationPriceHistoryPoint[];
 }
 
+/**
+ * Configuration for the price chart, defining the color, labels, axis, ticks and
+ * tooltip formatting for each fuel type.
+ */
 const lineConfig = {
-    diesel: { color: '#2563eb', label: 'Diesel' },
-    e5: { color: '#0f9f6e', label: 'E5' },
-    e10: { color: '#ef6c3d', label: 'E10' },
+    diesel: { color: '#457aec', label: 'Diesel' },
+    e5: { color: '#13c388', label: 'E5' },
+    e10: { color: '#e85468', label: 'E10' },
 } as const;
 
 const X_AXIS_TICK_COUNT = 6;
@@ -39,29 +43,29 @@ function createLinearTicks(start: number, end: number, count: number, precision:
     });
 }
 
+function formatTooltipDay(day: string) {
+    if (!day) {
+        return '';
+    }
+
+    const [year, month, dayOfMonth] = day.split('-');
+    return `${dayOfMonth}.${month}.${year}`;
+}
+
 function formatPrice(value: number | null) {
     if (value === null || Number.isNaN(value)) {
         return '-';
     }
 
-    return `${value.toFixed(3).replace('.', ',')} €`;
+    return `${value.toFixed(2).replace('.', ',')} €`;
 }
 
 export default function PriceChart({ data }: PriceChartProps) {
-    if (data.length === 0) {
-        return <div className="station-chart-empty">Noch keine 30-Tage-Preisdaten verfügbar.</div>;
-    }
-
     const chartData = data.map((entry, index) => ({ ...entry, index }));
     const maxIndex = chartData.length - 1;
     const xTickCount = Math.min(X_AXIS_TICK_COUNT, chartData.length);
     const xTicks = createLinearTicks(0, maxIndex, xTickCount, 6);
     const values = data.flatMap((entry) => [entry.diesel, entry.e5, entry.e10]).filter((value): value is number => typeof value === 'number');
-
-    if (values.length === 0) {
-        return <div className="station-chart-empty">Noch keine 30-Tage-Preisdaten verfügbar.</div>;
-    }
-
     const minimumValue = Math.min(...values);
     const maximumValue = Math.max(...values);
     const padding = Math.max(0.015, (maximumValue - minimumValue) * 0.2 || 0.03);
@@ -69,6 +73,10 @@ export default function PriceChart({ data }: PriceChartProps) {
     const upperPadding = padding;
     const yTicks = createLinearTicks(minimumValue - lowerPadding, maximumValue + upperPadding, Y_AXIS_TICK_COUNT, 3);
     const xLabelFormatter = (value: number) => chartData[clamp(Math.round(value), 0, maxIndex)]?.label ?? '';
+
+    if (data.length === 0 || values.length === 0) {
+        return <div className="station-chart-empty">Noch keine Preisdaten verfügbar.</div>;
+    }
 
     return (
         <ResponsiveContainer width="100%" height={220}>
@@ -104,7 +112,7 @@ export default function PriceChart({ data }: PriceChartProps) {
 
                         return [formatPrice(normalizedValue), normalizedName];
                     }}
-                    labelFormatter={(value) => `Tag: ${xLabelFormatter(Number(value))}`}
+                    labelFormatter={(value) => formatTooltipDay(chartData[clamp(Number(value), 0, maxIndex)]?.day ?? '')}
                     contentStyle={{
                         borderRadius: '16px',
                         border: '1px solid rgba(0, 0, 0, 0.08)',
