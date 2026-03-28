@@ -49,7 +49,7 @@
     },
 
     // Install dependencies after container creation
-    "postCreateCommand": "npm install && npm --prefix functions install",
+    "postCreateCommand": "npm install && npm --prefix functions install && npm i -g @openai/codex",
 
     // VS Code extensions for your stack
     "customizations": {
