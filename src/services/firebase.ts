@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, limit, orderBy, query } from 'firebase/firestore';
 import { db } from '../configs/firebase';
 
 export async function loadCurrentFuelPrices() {
@@ -15,7 +15,8 @@ export async function loadCurrentFuelPrices() {
 export async function loadDailyAverages() {
     try {
         const dailyAverages = collection(db, 'fuel_prices', 'historic', 'daily_average');
-        const snapshot = await getDocs(dailyAverages);
+        const dailyAveragesQuery = query(dailyAverages, orderBy('day', 'desc'), limit(50));
+        const snapshot = await getDocs(dailyAveragesQuery);
         const data: object[] = [];
 
         if (!snapshot.empty) {

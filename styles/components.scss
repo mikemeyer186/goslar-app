@@ -43,7 +43,9 @@
 
     .loader::after {
         border-color: $bg-spinner-light;
-        animation: prixClipFix 2s linear infinite, rotate 0.5s linear infinite reverse;
+        animation:
+            prixClipFix 2s linear infinite,
+            rotate 0.5s linear infinite reverse;
         inset: 10px;
     }
 }
@@ -247,28 +249,38 @@
         padding: 16px;
         margin-bottom: 16px;
         width: 100%;
-        height: 85px;
+        min-height: 92px;
         transition: $transition-normal;
         display: flex;
         flex-direction: column;
         overflow: hidden;
         cursor: pointer;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(249, 249, 247, 1) 100%);
 
         .station-small-content {
             display: flex;
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
+            gap: 16px;
 
             .station-left {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                min-width: 0;
+
                 .station-brand {
-                    font-weight: 600;
+                    font-weight: 700;
+                    font-size: 1.05rem;
+                    letter-spacing: 0.01em;
                 }
 
                 .station-adress {
                     font-weight: 400;
                     font-size: 0.9rem;
                     text-transform: capitalize;
+                    color: rgba(63, 63, 62, 0.86);
 
                     @media (max-width: 330px) {
                         font-size: 0.8rem;
@@ -277,8 +289,17 @@
             }
 
             .station-right {
+                flex-shrink: 0;
                 font-size: 1.7rem;
                 font-weight: 700;
+                line-height: 1;
+                color: $txt-color-main;
+                padding-top: 6px;
+                opacity: 1;
+                transform: translateY(0);
+                transition:
+                    opacity 180ms ease,
+                    transform 220ms ease;
 
                 @media (max-width: 348px) {
                     font-size: 1.4rem;
@@ -292,67 +313,130 @@
                     font-size: 1rem;
                 }
             }
+
+            .station-right-hidden {
+                opacity: 0;
+                pointer-events: none;
+            }
         }
 
         .station-large-content {
             transition: $transition-normal;
             opacity: 0;
-            padding-top: 8px;
+            max-height: 0;
+            pointer-events: none;
             display: flex;
             flex-direction: column;
-            height: 100%;
+            gap: 16px;
 
-            .station-table-chart {
+            .station-large-header {
                 display: flex;
-                flex-direction: row;
                 justify-content: space-between;
-                align-items: stretch;
+                align-items: center;
+                gap: 12px;
+                padding-top: 12px;
+                flex-wrap: wrap;
+            }
 
-                .station-table {
-                    padding-top: 16px;
-                    border-spacing: 0;
-                    line-height: 1.5;
-                    font-size: 1.2rem;
-                    flex-shrink: 0;
-                    flex-grow: 0;
-                    margin-right: 32px;
+            .station-large-caption {
+                display: block;
+                text-align: center;
+                width: 100%;
+                font-size: 0.8rem;
+                font-weight: 500;
+                color: rgba(63, 63, 62, 0.7);
+                letter-spacing: 0.01em;
+            }
 
-                    td {
-                        padding: 0;
-                    }
+            .station-price-overview {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 10px;
+            }
 
-                    .station-table-price {
-                        padding-left: 16px;
-                        font-weight: 500;
-                    }
+            .station-price-card {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                gap: 6px;
+                padding: 12px;
+                border-radius: 18px;
+                background-color: rgba(255, 255, 255, 0.9);
+                border: 1px solid rgba(0, 0, 0, 0.06);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+            }
+            .station-price-label {
+                font-size: 0.8rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .fuel-type-label-diesel {
+                color: #457aec;
+            }
+
+            .fuel-type-label-e5 {
+                color: #13c388;
+            }
+
+            .fuel-type-label-e10 {
+                color: #e85468;
+            }
+
+            .station-price-value {
+                font-size: 1.35rem;
+                font-weight: 700;
+                line-height: 1.1;
+
+                @media (max-width: 350px) {
+                    font-size: 1.1rem;
                 }
 
-                .station-chart {
-                    position: absolute;
-                    bottom: -15px;
-                    right: 16px;
-                    height: 132px;
-                    width: calc(100% - 179px);
-
-                    *:focus,
-                    *:focus-visible {
-                        outline: none;
-                    }
-
-                    .recharts-surface {
-                        cursor: pointer;
-                    }
+                @media (max-width: 330px) {
+                    font-size: 1rem;
                 }
+                @media (max-width: 300px) {
+                    font-size: 0.9rem;
+                }
+            }
+
+            .station-chart {
+                width: calc(100%);
+                padding: 16px 12px 6px 2px;
+                border-radius: 22px;
+                background: rgba(255, 255, 255, 0.88);
+                border: 1px solid rgba(0, 0, 0, 0.06);
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+                *:focus,
+                *:focus-visible {
+                    outline: none;
+                }
+            }
+
+            .station-chart-empty {
+                min-height: 220px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                color: rgba(63, 63, 62, 0.66);
+                font-size: 0.95rem;
+                padding: 0 24px;
             }
         }
 
         .station-large-visible {
             opacity: 1;
+            max-height: 520px;
+            pointer-events: auto;
         }
     }
 
     .station-large {
-        height: 210px;
+        min-height: 410px;
     }
 
     .station-status {
@@ -373,8 +457,8 @@
     }
 
     .station-large-status {
-        font-weight: 300;
-        font-size: 0.8rem;
+        font-weight: 600;
+        font-size: 0.84rem;
     }
 
     .station-large-open {
