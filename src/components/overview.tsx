@@ -3,6 +3,7 @@ import { loadCurrentFuelPrices, loadDailyAverages } from '../services/firebase';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { DailyAverageRecord, FuelSelection, StationPriceHistoryPoint } from '../interfaces/dailyAverage';
+import { buildStationPriceHistory, getVisibleStations } from '../utils/overview.helpers';
 import Station from '../interfaces/station';
 import TileStation from './stationTile';
 import Toolbar from './toolbar';
@@ -28,9 +29,6 @@ export default function Overview() {
     const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
     const navigate = useNavigate();
     const didInit = useRef(false);
-    let sortedFuelStations: Station[] = [];
-    let openStations: Station[] = [];
-    let filteredFuelStations: Station[] = [];
 
     /**
      * checks if all services of usercentrics are accepted
@@ -123,45 +121,6 @@ export default function Overview() {
     }
 
     /**
-     * formats the history label for a given day
-     * @param day - day as string in format YYYY-MM-DD
-     * @returns - formatted label as string in format DD.MM.
-     */
-    function formatHistoryLabel(day: string) {
-        const [, month, dayOfMonth] = day.split('-');
-        return `${dayOfMonth}.${month}.`;
-    }
-
-    /**
-     * builds the price history for each station from the daily average records
-     * @param records - data from firestore with daily average prices for each station
-     * @returns - price history for each station, sorted by day and limited to the last 30 days
-     */
-    function buildStationPriceHistory(records: DailyAverageRecord[]) {
-        const latestRecords = records
-            .slice()
-            .sort((a, b) => a.day.localeCompare(b.day))
-            .slice(-30);
-        const stationIds = Array.from(new Set(latestRecords.flatMap((record) => Object.keys(record.stations ?? {}))));
-
-        return stationIds.reduce<Record<string, StationPriceHistoryPoint[]>>((historyByStation, stationId) => {
-            historyByStation[stationId] = latestRecords.map((record) => {
-                const stationEntry = record.stations?.[stationId];
-
-                return {
-                    day: record.day,
-                    label: formatHistoryLabel(record.day),
-                    diesel: stationEntry?.average.diesel ?? null,
-                    e5: stationEntry?.average.e5 ?? null,
-                    e10: stationEntry?.average.e10 ?? null,
-                };
-            });
-
-            return historyByStation;
-        }, {});
-    }
-
-    /**
      * loads the current prices from firestore
      */
     async function handlePriceLoading() {
@@ -249,27 +208,12 @@ export default function Overview() {
         prevConsentRef.current = isAllConsentsAccepted;
     }, [isAllConsentsAccepted]);
 
-    // sorting of stations by price (selected fuel button)
-    sortedFuelStations = fuelStations
-        .slice()
-        .sort((a: Station, b: Station) => a[activeSelection] - b[activeSelection])
-        .filter((station: Station) => station[activeSelection] > 0);
-
-    // filters only open stations (toggle)
-    if (showOnlyOpenStations) {
-        openStations = sortedFuelStations.filter((station: Station) => station.isOpen);
-    } else {
-        openStations = sortedFuelStations;
-    }
-
-    // filters selected stations by cities (filter menu)
-    if (isFiltered) {
-        filteredFuelStations = openStations.filter((station: Station) =>
-            selectedCities.some((city) => station.place.toLowerCase().includes(city.toLowerCase())),
-        );
-    } else {
-        filteredFuelStations = openStations;
-    }
+    const { openStations, filteredFuelStations } = getVisibleStations({
+        fuelStations,
+        activeSelection,
+        showOnlyOpenStations,
+        selectedCities,
+    });
 
     return (
         <>

@@ -1,6 +1,7 @@
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import { StationPriceHistoryPoint } from '../interfaces/dailyAverage';
+import { clamp, createLinearTicks, formatPrice, formatTooltipDay } from '../utils/priceChart.helpers';
 
 interface PriceChartProps {
     data: StationPriceHistoryPoint[];
@@ -18,47 +19,6 @@ const lineConfig = {
 
 const X_AXIS_TICK_COUNT = 6;
 const Y_AXIS_TICK_COUNT = 5;
-
-function clamp(value: number, min: number, max: number) {
-    return Math.min(Math.max(value, min), max);
-}
-
-function roundTick(value: number, precision: number) {
-    return Number(value.toFixed(precision));
-}
-
-function createLinearTicks(start: number, end: number, count: number, precision: number) {
-    if (count <= 1 || start === end) {
-        return [roundTick(start, precision)];
-    }
-
-    const step = (end - start) / (count - 1);
-
-    return Array.from({ length: count }, (_, index) => {
-        if (index === count - 1) {
-            return roundTick(end, precision);
-        }
-
-        return roundTick(start + step * index, precision);
-    });
-}
-
-function formatTooltipDay(day: string) {
-    if (!day) {
-        return '';
-    }
-
-    const [year, month, dayOfMonth] = day.split('-');
-    return `${dayOfMonth}.${month}.${year}`;
-}
-
-function formatPrice(value: number | null) {
-    if (value === null || Number.isNaN(value)) {
-        return '-';
-    }
-
-    return `${value.toFixed(2).replace('.', ',')} €`;
-}
 
 export default function PriceChart({ data }: PriceChartProps) {
     const chartData = data.map((entry, index) => ({ ...entry, index }));
