@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clamp, createLinearTicks, formatPrice, formatTooltipDay } from '../../utils/priceChart.helpers';
+import { clamp, createLinearTicks, formatPrice, formatTooltipDay } from '../priceChart.helpers';
 
 describe('priceChart helpers', () => {
     it('clamps values to the provided range', () => {
