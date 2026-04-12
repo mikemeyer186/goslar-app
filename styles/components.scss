@@ -404,7 +404,7 @@
 
             .station-chart {
                 width: calc(100%);
-                padding: 16px 12px 6px 2px;
+                padding: 12px 12px 6px 2px;
                 border-radius: 22px;
                 background: rgba(255, 255, 255, 0.88);
                 border: 1px solid rgba(0, 0, 0, 0.06);
@@ -414,6 +414,53 @@
                 *:focus,
                 *:focus-visible {
                     outline: none;
+                }
+            }
+
+            .station-chart-tabs {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 6px;
+                padding: 0 0 12px 10px;
+            }
+
+            .station-chart-tab {
+                height: 34px;
+                border: 1px solid rgba(63, 63, 62, 0.2);
+                border-radius: 8px;
+                background: rgba(255, 255, 255, 0.86);
+                color: rgba(63, 63, 62, 0.78);
+                font-family: 'Roboto', sans-serif;
+                font-size: 0.82rem;
+                font-weight: 700;
+                cursor: pointer;
+                transition: $transition-short;
+            }
+
+            .station-chart-tab-active {
+                background: $bg-btn-active;
+                border-color: $bg-btn-active;
+                color: $txt-color-btn-active;
+            }
+
+            .station-chart-panel {
+                animation: station-chart-panel-fade 180ms ease-out;
+                will-change: opacity, transform;
+            }
+
+            @keyframes station-chart-panel-fade {
+                from {
+                    opacity: 0;
+                }
+
+                to {
+                    opacity: 1;
+                }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                .station-chart-panel {
+                    animation: none;
                 }
             }
 
@@ -431,13 +478,13 @@
 
         .station-large-visible {
             opacity: 1;
-            max-height: 520px;
+            max-height: 570px;
             pointer-events: auto;
         }
     }
 
     .station-large {
-        min-height: 410px;
+        min-height: 450px;
     }
 
     .station-status {
