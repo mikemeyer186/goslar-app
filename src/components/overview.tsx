@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { loadCurrentFuelPrices, loadDailyAverages } from '../services/firebase';
+import { loadCurrentFuelPrices, loadDailyAverages, loadLastPrices } from '../services/firebase';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import { DailyAverageRecord, FuelSelection, StationPriceHistoryPoint } from '../interfaces/dailyAverage';
-import { buildStationPriceHistory, getVisibleStations } from '../utils/overview.helpers';
+import { DailyAverageRecord, FuelSelection, StationLatestPricePoint, StationPriceHistoryPoint } from '../interfaces/dailyAverage';
+import { buildStationLatestPriceHistory, buildStationPriceHistory, getVisibleStations } from '../utils/overview.helpers';
 import Station from '../interfaces/station';
 import TileStation from './stationTile';
 import Toolbar from './toolbar';
@@ -18,6 +18,7 @@ export default function Overview() {
     const [searchParams] = useSearchParams('');
     const [fuelStations, setFuelStations] = useState<Station[]>([]);
     const [stationPriceHistory, setStationPriceHistory] = useState<Record<string, StationPriceHistoryPoint[]>>({});
+    const [stationLatestPriceHistory, setStationLatestPriceHistory] = useState<Record<string, StationLatestPricePoint[]>>({});
     const [lastUpdate, setLastUpdate] = useState<string>('');
     const [isLoaded, setIsLoaded] = useState(false);
     const [activeSelection, setActiveSelection] = useState<FuelSelection>('diesel');
@@ -124,10 +125,10 @@ export default function Overview() {
      * loads the current prices from firestore
      */
     async function handlePriceLoading() {
-        const stationsData = await loadCurrentFuelPrices();
-        const dailyAverages = (await loadDailyAverages()) as DailyAverageRecord[];
+        const [stationsData, dailyAverages, lastPrices] = await Promise.all([loadCurrentFuelPrices(), loadDailyAverages(), loadLastPrices()]);
         setFuelStations(stationsData?.data ?? []);
-        setStationPriceHistory(buildStationPriceHistory(dailyAverages ?? []));
+        setStationPriceHistory(buildStationPriceHistory((dailyAverages ?? []) as DailyAverageRecord[]));
+        setStationLatestPriceHistory(buildStationLatestPriceHistory(lastPrices ?? []));
         setLastUpdate(stationsData?.updated ?? '');
         setTimeout(() => {
             setIsLoaded(true);
@@ -240,6 +241,7 @@ export default function Overview() {
                                             station={station}
                                             activeSelection={activeSelection}
                                             priceHistory={stationPriceHistory[station.id] ?? []}
+                                            latestPriceHistory={stationLatestPriceHistory[station.id] ?? []}
                                         />
                                     );
                                 })}

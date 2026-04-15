@@ -2,7 +2,7 @@ import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { DailyAverageRecord } from '../../interfaces/dailyAverage';
+import type { DailyAverageRecord, LastPriceRecord } from '../../interfaces/dailyAverage';
 import Overview from '../overview';
 
 vi.mock('@formkit/auto-animate/react', () => ({
@@ -12,9 +12,10 @@ vi.mock('@formkit/auto-animate/react', () => ({
 vi.mock('../../services/firebase', () => ({
     loadCurrentFuelPrices: vi.fn(),
     loadDailyAverages: vi.fn(),
+    loadLastPrices: vi.fn(),
 }));
 
-const { loadCurrentFuelPrices, loadDailyAverages } = await import('../../services/firebase');
+const { loadCurrentFuelPrices, loadDailyAverages, loadLastPrices } = await import('../../services/firebase');
 
 const stationData = {
     updated: '10:30',
@@ -79,11 +80,22 @@ const dailyAverages: DailyAverageRecord[] = [
     },
 ];
 
+const lastPrices: LastPriceRecord[] = [
+    {
+        date: '2026-03-27T10:00:00.000Z',
+        data: [
+            { id: 'station-shell', diesel: 1.799, e5: 1.949, e10: 1.889, isOpen: true },
+            { id: 'station-aral', diesel: 1.759, e5: 1.909, e10: 1.849, isOpen: false },
+        ],
+    },
+];
+
 describe('Overview', () => {
     beforeEach(() => {
         vi.useFakeTimers();
         vi.mocked(loadCurrentFuelPrices).mockResolvedValue(stationData);
         vi.mocked(loadDailyAverages).mockResolvedValue(dailyAverages);
+        vi.mocked(loadLastPrices).mockResolvedValue(lastPrices);
         vi.mocked(UC_UI.areAllConsentsAccepted).mockReturnValue(true);
     });
 
@@ -112,6 +124,7 @@ describe('Overview', () => {
         });
 
         expect(loadCurrentFuelPrices).toHaveBeenCalledTimes(1);
+        expect(loadLastPrices).toHaveBeenCalledTimes(1);
 
         vi.useRealTimers();
         const user = userEvent.setup();

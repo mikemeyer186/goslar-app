@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import type { DailyAverageRecord } from '../../interfaces/dailyAverage';
+import type { DailyAverageRecord, LastPriceRecord } from '../../interfaces/dailyAverage';
 import type Station from '../../interfaces/station';
-import { buildStationPriceHistory, formatHistoryLabel, getVisibleStations } from '../overview.helpers';
+import { buildStationLatestPriceHistory, buildStationPriceHistory, formatHistoryLabel, getVisibleStations } from '../overview.helpers';
 
 const stations: Station[] = [
     {
@@ -54,6 +54,33 @@ const stations: Station[] = [
     },
 ];
 
+
+function createLastPriceRecord(date: string, isShellOpen: boolean, includeAral = true): LastPriceRecord {
+    return {
+        date,
+        data: [
+            {
+                id: 'station-shell',
+                diesel: 1.7,
+                e5: 1.8,
+                e10: 1.75,
+                isOpen: isShellOpen,
+            },
+            ...(includeAral
+                ? [
+                      {
+                          id: 'station-aral',
+                          diesel: 1.68,
+                          e5: 1.78,
+                          e10: 1.72,
+                          isOpen: true,
+                      },
+                  ]
+                : []),
+        ],
+    };
+}
+
 function createRecord(day: string, stationIds: string[]): DailyAverageRecord {
     return {
         day,
@@ -105,6 +132,45 @@ describe('overview helpers', () => {
             diesel: null,
         });
         expect(history['station-shell'][29].day).toBe('2026-03-31');
+    });
+
+
+
+    it('builds latest real-price history sorted by timestamp and marks closed periods', () => {
+        const records: LastPriceRecord[] = [
+            createLastPriceRecord('2026-03-30T10:30:00.000Z', false, false),
+            createLastPriceRecord('2026-03-30T10:00:00.000Z', true),
+        ];
+
+        const history = buildStationLatestPriceHistory(records);
+
+        expect(history['station-shell']).toHaveLength(2);
+        expect(history['station-shell'][0]).toMatchObject({
+            date: '2026-03-30T10:00:00.000Z',
+            label: '12:00',
+            weekdayLabel: 'Mo',
+            diesel: 1.7,
+            isClosed: false,
+        });
+        expect(history['station-shell'][1]).toMatchObject({
+            date: '2026-03-30T10:30:00.000Z',
+            diesel: null,
+            e5: null,
+            e10: null,
+            isClosed: true,
+        });
+        expect(history['station-aral'][1]).toMatchObject({
+            diesel: null,
+            isClosed: true,
+        });
+    });
+
+    it('limits latest real-price history to 336 entries', () => {
+        const records = Array.from({ length: 337 }, (_, index) => createLastPriceRecord(`2026-03-30T${String(index % 24).padStart(2, '0')}:00:00.000Z`, true));
+
+        const history = buildStationLatestPriceHistory(records);
+
+        expect(history['station-shell']).toHaveLength(336);
     });
 
     it('sorts, removes zero prices, and applies open and city filters', () => {

@@ -1,5 +1,6 @@
 import { collection, doc, getDoc, getDocs, limit, orderBy, query } from 'firebase/firestore';
 import { db } from '../configs/firebase';
+import type { LastPriceRecord } from '../interfaces/dailyAverage';
 
 export async function loadCurrentFuelPrices() {
     const docRef = doc(db, 'fuel_prices', 'all');
@@ -29,6 +30,33 @@ export async function loadDailyAverages() {
         }
 
         return data;
+    } catch (error) {
+        console.error('Error while requesting fuel prices:', error);
+        throw error;
+    }
+}
+
+export async function loadLastPrices(): Promise<LastPriceRecord[]> {
+    try {
+        const lastPrices = collection(db, 'fuel_prices', 'historic', 'iso_timestamps');
+        const lastQuery = query(lastPrices, orderBy('__name__', 'desc'), limit(336));
+        const snapshot = await getDocs(lastQuery);
+        const prices: LastPriceRecord[] = [];
+
+        if (!snapshot.empty) {
+            snapshot.forEach((doc) => {
+                const docData = doc.data().data;
+
+                prices.push({
+                    date: doc.id,
+                    data: Array.isArray(docData) ? docData : [],
+                });
+            });
+        } else {
+            console.log('No fuel prices found!');
+        }
+
+        return prices;
     } catch (error) {
         console.error('Error while requesting fuel prices:', error);
         throw error;

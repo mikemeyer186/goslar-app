@@ -1,12 +1,13 @@
 import { useState } from 'react';
+import { FuelSelection, StationLatestPricePoint, StationPriceHistoryPoint } from '../interfaces/dailyAverage';
 import PriceChart from './priceChart';
 import Station from '../interfaces/station';
-import { FuelSelection, StationPriceHistoryPoint } from '../interfaces/dailyAverage';
 
 interface StationTileProps {
     station: Station;
     activeSelection: FuelSelection;
     priceHistory: StationPriceHistoryPoint[];
+    latestPriceHistory: StationLatestPricePoint[];
 }
 
 interface PriceCardConfig {
@@ -15,7 +16,7 @@ interface PriceCardConfig {
     value: number;
 }
 
-export default function StationTile({ station, activeSelection, priceHistory }: StationTileProps) {
+export default function StationTile({ station, activeSelection, priceHistory, latestPriceHistory }: StationTileProps) {
     const [stationClicked, setStationClicked] = useState(false);
     const selectedPrice = station[activeSelection];
     const priceCards: PriceCardConfig[] = [
@@ -97,8 +98,7 @@ export default function StationTile({ station, activeSelection, priceHistory }: 
                 </div>
 
                 <div className="station-chart" onClick={onChartClick}>
-                    <span className="station-large-caption">Preisverlauf der letzten 30 Tage</span>
-                    <PriceChart data={priceHistory} />
+                    <PriceChart averageData={priceHistory} latestPriceData={latestPriceHistory} />
                 </div>
             </div>
         </section>

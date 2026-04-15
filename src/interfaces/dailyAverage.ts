@@ -26,3 +26,27 @@ export interface StationPriceHistoryPoint {
     e5: number | null;
     e10: number | null;
 }
+
+export interface LastPriceStationEntry {
+    id: string;
+    diesel: number | null;
+    e5: number | null;
+    e10: number | null;
+    isOpen: boolean;
+}
+
+export interface LastPriceRecord {
+    date: string;
+    data: LastPriceStationEntry[];
+}
+
+export interface StationLatestPricePoint {
+    date: string;
+    label: string;
+    tooltipLabel: string;
+    weekdayLabel: string;
+    diesel: number | null;
+    e5: number | null;
+    e10: number | null;
+    isClosed: boolean;
+}
