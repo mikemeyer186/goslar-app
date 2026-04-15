@@ -1,7 +1,7 @@
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 import type { StationLatestPricePoint, StationPriceHistoryPoint } from '../../interfaces/dailyAverage';
 import PriceChart from '../priceChart';
 
@@ -39,7 +39,24 @@ vi.mock('recharts', () => ({
     YAxis: ({ interval, ticks = [] }: { interval?: number | string; ticks?: number[] }) => (
         <div data-interval={interval} data-testid="y-axis" data-ticks={ticks.join('|')} />
     ),
-    Line: ({ connectNulls }: { connectNulls?: boolean }) => <div data-testid="line">{String(connectNulls)}</div>,
+    Line: ({
+        connectNulls,
+        dataKey,
+        dot,
+    }: {
+        connectNulls?: boolean;
+        dataKey?: string;
+        dot?: false | ((props: { cx: number; cy: number; dataKey?: string; index: number; payload: Record<string, never>; points: []; value: number }) => ReactNode);
+    }) => {
+        const marker = typeof dot === 'function' ? dot({ cx: 10, cy: 10, dataKey, index: 0, payload: {}, points: [], value: 1 }) : null;
+
+        return (
+            <div data-has-isolated-dot={marker === null ? 'false' : 'true'} data-testid="line">
+                {String(connectNulls)}
+                {marker}
+            </div>
+        );
+    },
 }));
 
 const averageData: StationPriceHistoryPoint[] = [
@@ -144,7 +161,13 @@ describe('PriceChart', () => {
         expect(screen.getByText('Ø-Preise der letzten 30 Tage')).toBeInTheDocument();
     });
 
-    it('rotates the closed range label at 300px chart width', () => {
+    it('renders markers for isolated 24 hour points before closed ranges', () => {
+        render(<PriceChart averageData={averageData} latestPriceData={latestPriceData} />);
+
+        expect(screen.getAllByTestId('line').map((line) => line.getAttribute('data-has-isolated-dot'))).toEqual(['true', 'true', 'true']);
+    });
+
+    it('hides the closed range label only when the rendered range is narrower than 75px', () => {
         render(<PriceChart averageData={averageData} latestPriceData={latestPriceData} />);
 
         act(() => {
@@ -152,9 +175,14 @@ describe('PriceChart', () => {
         });
 
         expect(screen.getByTestId('closed-range')).toHaveTextContent('geschlossen');
-        expect(screen.getByTestId('closed-range')).toHaveAttribute('data-angle', '90');
-        expect(screen.getByTestId('closed-range')).not.toHaveAttribute('data-width');
-        expect(screen.getByTestId('closed-range')).not.toHaveAttribute('data-max-lines');
+        expect(screen.getByTestId('closed-range')).not.toHaveAttribute('data-angle');
+
+        act(() => {
+            rechartsMockState.onResize?.(200, 220);
+        });
+
+        expect(screen.getByTestId('closed-range')).not.toHaveTextContent('geschlossen');
+        expect(screen.getByTestId('closed-range')).not.toHaveAttribute('data-angle');
     });
 
     it('renders complete evenly spaced ticks on both axes', () => {

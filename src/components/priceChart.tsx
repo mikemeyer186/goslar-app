@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { CartesianGrid, Line, LineChart, ReferenceArea, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import type { DotItemDotProps } from 'recharts';
 import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import { StationLatestPricePoint, StationPriceHistoryPoint } from '../interfaces/dailyAverage';
 import { clamp, createLinearTicks, formatPrice, formatTooltipDay } from '../utils/priceChart.helpers';
@@ -38,6 +39,8 @@ const lineConfig = {
     e10: { color: '#e85468', label: 'E10' },
 } as const;
 
+type FuelKey = keyof typeof lineConfig;
+
 const chartTabs: Array<{ key: ChartTabKey; label: string; caption: string }> = [
     { key: 'latest24', label: '24 Stunden', caption: 'Preise der letzten 24 Stunden' },
     { key: 'latest7', label: '7 Tage', caption: 'Preise der letzten 7 Tage' },
@@ -52,7 +55,11 @@ const SMALL_CHART_WIDTH = 300;
 const Y_AXIS_TICK_COUNT = 5;
 const MINUTES_PER_DAY = 24 * 60;
 const MIN_DAY_TICK_SPACING_RATIO = 0.15;
-const CLOSED_LABEL_ROTATE_WIDTH = 300;
+const CLOSED_LABEL_MIN_WIDTH = 75;
+const CHART_MARGIN_RIGHT = 10;
+const Y_AXIS_WIDTH = 60;
+const X_AXIS_LEFT_PADDING = 10;
+const X_AXIS_RIGHT_PADDING = 6;
 
 const closedRangeLabelStyle = {
     position: 'center',
@@ -63,6 +70,24 @@ const closedRangeLabelStyle = {
 
 function getChartValues(data: ChartPoint[]) {
     return data.flatMap((entry) => [entry.diesel, entry.e5, entry.e10]).filter((value): value is number => typeof value === 'number');
+}
+
+function hasFuelValue(entry: ChartPoint | undefined, fuelKey: FuelKey) {
+    return typeof entry?.[fuelKey] === 'number';
+}
+
+function isIsolatedFuelPoint(data: ChartPoint[], index: number, fuelKey: FuelKey) {
+    return hasFuelValue(data[index], fuelKey) && !hasFuelValue(data[index - 1], fuelKey) && !hasFuelValue(data[index + 1], fuelKey);
+}
+
+function renderIsolatedFuelDot(data: ChartPoint[], fuelKey: FuelKey, color: string) {
+    return ({ cx, cy, index }: DotItemDotProps) => {
+        if (typeof cx !== 'number' || typeof cy !== 'number' || !isIsolatedFuelPoint(data, index, fuelKey)) {
+            return null;
+        }
+
+        return <circle cx={cx} cy={cy} r={3} fill={color} stroke="#ffffff" strokeWidth={1.5} />;
+    };
 }
 
 function getDesiredXAxisTickCount(activeTab: ChartTabKey, chartWidth: number | null) {
@@ -138,13 +163,24 @@ function getWeekdayTicks(data: ChartPoint[]) {
     return ticks;
 }
 
-function getClosedRangeLabel(chartWidth: number | null) {
-    if (chartWidth !== null && chartWidth <= CLOSED_LABEL_ROTATE_WIDTH) {
-        return {
-            ...closedRangeLabelStyle,
-            value: 'geschlossen',
-            angle: 90,
-        };
+function getClosedRangeWidth(chartWidth: number | null, range: ClosedRange, maxIndex: number) {
+    if (chartWidth === null || maxIndex <= 0) {
+        return null;
+    }
+
+    const drawableWidth = chartWidth - CHART_MARGIN_RIGHT - Y_AXIS_WIDTH - X_AXIS_LEFT_PADDING - X_AXIS_RIGHT_PADDING;
+    const rangeStart = Math.max(0, range.start - 0.5);
+    const rangeEnd = Math.min(maxIndex, range.end + 0.5);
+    const rangeRatio = (rangeEnd - rangeStart) / maxIndex;
+
+    return Math.max(0, drawableWidth * rangeRatio);
+}
+
+function getClosedRangeLabel(chartWidth: number | null, range: ClosedRange, maxIndex: number) {
+    const closedRangeWidth = getClosedRangeWidth(chartWidth, range, maxIndex);
+
+    if (closedRangeWidth !== null && closedRangeWidth < CLOSED_LABEL_MIN_WIDTH) {
+        return undefined;
     }
 
     return {
@@ -264,7 +300,7 @@ export default function PriceChart({ averageData, latestPriceData }: PriceChartP
                             fill="#8f8f8f"
                             fillOpacity={0.14}
                             strokeOpacity={0}
-                            label={getClosedRangeLabel(chartWidth)}
+                            label={getClosedRangeLabel(chartWidth, range, maxIndex)}
                         />
                     ))}
                     <XAxis
@@ -316,7 +352,7 @@ export default function PriceChart({ averageData, latestPriceData }: PriceChartP
                         dataKey="diesel"
                         stroke={lineConfig.diesel.color}
                         strokeWidth={3}
-                        dot={false}
+                        dot={activeTab === 'latest24' ? renderIsolatedFuelDot(chartData, 'diesel', lineConfig.diesel.color) : false}
                         activeDot={{ r: 4 }}
                         connectNulls={activeTab !== 'latest24'}
                         isAnimationActive={false}
@@ -326,7 +362,7 @@ export default function PriceChart({ averageData, latestPriceData }: PriceChartP
                         dataKey="e5"
                         stroke={lineConfig.e5.color}
                         strokeWidth={3}
-                        dot={false}
+                        dot={activeTab === 'latest24' ? renderIsolatedFuelDot(chartData, 'e5', lineConfig.e5.color) : false}
                         activeDot={{ r: 4 }}
                         connectNulls={activeTab !== 'latest24'}
                         isAnimationActive={false}
@@ -336,7 +372,7 @@ export default function PriceChart({ averageData, latestPriceData }: PriceChartP
                         dataKey="e10"
                         stroke={lineConfig.e10.color}
                         strokeWidth={3}
-                        dot={false}
+                        dot={activeTab === 'latest24' ? renderIsolatedFuelDot(chartData, 'e10', lineConfig.e10.color) : false}
                         activeDot={{ r: 4 }}
                         connectNulls={activeTab !== 'latest24'}
                         isAnimationActive={false}
