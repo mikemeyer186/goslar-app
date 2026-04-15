@@ -1,7 +1,7 @@
 import { useState } from 'react';
+import { FuelSelection, StationLatestPricePoint, StationPriceHistoryPoint } from '../interfaces/dailyAverage';
 import PriceChart from './priceChart';
 import Station from '../interfaces/station';
-import { FuelSelection, StationLatestPricePoint, StationPriceHistoryPoint } from '../interfaces/dailyAverage';
 
 interface StationTileProps {
     station: Station;

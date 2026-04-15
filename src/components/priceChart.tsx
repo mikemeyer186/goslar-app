@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { CartesianGrid, Line, LineChart, ReferenceArea, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { DotItemDotProps } from 'recharts';
 import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
+import { useState } from 'react';
+import { CartesianGrid, Line, LineChart, ReferenceArea, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { StationLatestPricePoint, StationPriceHistoryPoint } from '../interfaces/dailyAverage';
 import { clamp, createLinearTicks, formatPrice, formatTooltipDay } from '../utils/priceChart.helpers';
 
@@ -68,18 +68,43 @@ const closedRangeLabelStyle = {
     fontWeight: 600,
 } as const;
 
+/**
+ * Generates an array of all available fuel price values from the provided chart data
+ * @param data - an array of chart points containing price values for different fuel types
+ * @returns - a flat array of all diesel, e5 and e10 price values, excluding nulls and undefined
+ */
 function getChartValues(data: ChartPoint[]) {
     return data.flatMap((entry) => [entry.diesel, entry.e5, entry.e10]).filter((value): value is number => typeof value === 'number');
 }
 
+/**
+ * Checks if a chart point has a valid price value for the specified fuel type
+ * @param entry - a chart point containing price values for different fuel types
+ * @param fuelKey - the fuel type key ('diesel', 'e5' or 'e10') to check for a valid price value
+ * @returns - true if the chart point has a valid number price value for the specified fuel type, false otherwise
+ */
 function hasFuelValue(entry: ChartPoint | undefined, fuelKey: FuelKey) {
     return typeof entry?.[fuelKey] === 'number';
 }
 
+/**
+ * Determines if a chart point is an isolated fuel point (i.e., has a valid price value but neighboring points do not)
+ * @param data - an array of chart points containing price values for different fuel types
+ * @param index - the index of the chart point to check
+ * @param fuelKey - the fuel type key ('diesel', 'e5' or 'e10') to check for a valid price value
+ * @returns - true if the chart point is an isolated fuel point, false otherwise
+ */
 function isIsolatedFuelPoint(data: ChartPoint[], index: number, fuelKey: FuelKey) {
     return hasFuelValue(data[index], fuelKey) && !hasFuelValue(data[index - 1], fuelKey) && !hasFuelValue(data[index + 1], fuelKey);
 }
 
+/**
+ * Renders a dot for isolated fuel points
+ * @param data - an array of chart points containing price values for different fuel types
+ * @param fuelKey - the fuel type key ('diesel', 'e5' or 'e10') to check for a valid price value
+ * @param color - the color of the dot
+ * @returns - a SVG circle element representing the dot for an isolated fuel point
+ */
 function renderIsolatedFuelDot(data: ChartPoint[], fuelKey: FuelKey, color: string) {
     return ({ cx, cy, index }: DotItemDotProps) => {
         if (typeof cx !== 'number' || typeof cy !== 'number' || !isIsolatedFuelPoint(data, index, fuelKey)) {
@@ -90,6 +115,12 @@ function renderIsolatedFuelDot(data: ChartPoint[], fuelKey: FuelKey, color: stri
     };
 }
 
+/**
+ * Returns the desired number of ticks for the X-axis based on the active tab and chart width
+ * @param activeTab - the currently active chart tab key
+ * @param chartWidth - the current width of the chart
+ * @returns - the desired number of ticks for the X-axis
+ */
 function getDesiredXAxisTickCount(activeTab: ChartTabKey, chartWidth: number | null) {
     if (chartWidth !== null && chartWidth < SMALL_CHART_WIDTH && activeTab !== 'latest7') {
         return COMPACT_X_AXIS_TICK_COUNT;
@@ -98,6 +129,11 @@ function getDesiredXAxisTickCount(activeTab: ChartTabKey, chartWidth: number | n
     return activeTab === 'average30' ? X_AXIS_TICK_COUNT : LATEST_X_AXIS_TICK_COUNT;
 }
 
+/**
+ * Converts a time label in the format 'HH:MM' to total minutes since midnight
+ * @param label - the time label to convert
+ * @returns - the total minutes since midnight, or null if the label is invalid
+ */
 function getLabelMinutes(label: string) {
     const [hour, minute = '0'] = label.split(':');
     const hourValue = Number(hour);
@@ -110,6 +146,11 @@ function getLabelMinutes(label: string) {
     return hourValue * 60 + minuteValue;
 }
 
+/**
+ * Formats a total number of minutes since midnight into an hour label in the format 'HH:00'
+ * @param totalMinutes - the total number of minutes since midnight to format
+ * @returns - a formatted hour label in the format 'HH:00'
+ */
 function formatHourFromMinutes(totalMinutes: number) {
     const normalizedMinutes = Math.round(totalMinutes) % MINUTES_PER_DAY;
     const positiveMinutes = normalizedMinutes < 0 ? normalizedMinutes + MINUTES_PER_DAY : normalizedMinutes;
@@ -118,12 +159,23 @@ function formatHourFromMinutes(totalMinutes: number) {
     return `${hour.toString().padStart(2, '0')}:00`;
 }
 
+/**
+ * Formats a time label for the X-axis tick based on the provided label string
+ * @param label - the time label to format, expected in the format 'HH:MM'
+ * @returns - a formatted hour label in the format 'HH:00'
+ */
 function formatHourTick(label: string) {
     const labelMinutes = getLabelMinutes(label);
 
     return labelMinutes === null ? '' : formatHourFromMinutes(labelMinutes);
 }
 
+/**
+ * Formats a time label for the X-axis tick based on the provided data and value
+ * @param data - an array of chart points containing time labels
+ * @param value - the value representing the index of the chart point to format the label for
+ * @returns - a formatted hour label in the format 'HH:00'
+ */
 function formatLinearDayHourTick(data: ChartPoint[], value: number) {
     if (data.length < LATEST_24H_POINT_COUNT) {
         return formatHourTick(data[clamp(Math.round(value), 0, data.length - 1)]?.label ?? '');
@@ -139,6 +191,11 @@ function formatLinearDayHourTick(data: ChartPoint[], value: number) {
     return formatHourFromMinutes(startMinutes + progress * MINUTES_PER_DAY);
 }
 
+/**
+ * Returns the indices of ticks for each weekday in the chart data
+ * @param data - an array of chart points containing time labels and weekday labels
+ * @returns - an array of indices representing the ticks for each weekday, with leading ticks removed if they are too close together
+ */
 function getWeekdayTicks(data: ChartPoint[]) {
     const seenDates = new Set<string>();
     const ticks = data
@@ -163,6 +220,13 @@ function getWeekdayTicks(data: ChartPoint[]) {
     return ticks;
 }
 
+/**
+ * Calculates the width of a closed range on the chart
+ * @param chartWidth - the current width of the chart
+ * @param range - an object representing the start and end indices of the closed range
+ * @param maxIndex - the maximum index value in the chart data
+ * @returns - the calculated width of the closed range in pixels, or null if the chart width is not available or the max index is invalid
+ */
 function getClosedRangeWidth(chartWidth: number | null, range: ClosedRange, maxIndex: number) {
     if (chartWidth === null || maxIndex <= 0) {
         return null;
@@ -176,6 +240,13 @@ function getClosedRangeWidth(chartWidth: number | null, range: ClosedRange, maxI
     return Math.max(0, drawableWidth * rangeRatio);
 }
 
+/**
+ * Calculates the label for a closed range on the chart
+ * @param chartWidth - the current width of the chart
+ * @param range - an object representing the start and end indices of the closed range
+ * @param maxIndex - the maximum index value in the chart data
+ * @returns - the calculated label for the closed range, or undefined if it's too small to display
+ */
 function getClosedRangeLabel(chartWidth: number | null, range: ClosedRange, maxIndex: number) {
     const closedRangeWidth = getClosedRangeWidth(chartWidth, range, maxIndex);
 
@@ -189,6 +260,11 @@ function getClosedRangeLabel(chartWidth: number | null, range: ClosedRange, maxI
     };
 }
 
+/**
+ * Identifies closed ranges in the chart data based on the isClosed property of each chart point
+ * @param data - an array of chart points containing price values and closed status for different fuel types
+ * @returns - an array of closed ranges, where each range is represented by an object containing the start and end indices of the range
+ */
 function getClosedRanges(data: ChartPoint[]) {
     const ranges: ClosedRange[] = [];
     let openRangeStart: number | null = null;
@@ -210,6 +286,13 @@ function getClosedRanges(data: ChartPoint[]) {
     return ranges;
 }
 
+/**
+ * Generates chart data based on the active tab and provided price data
+ * @param activeTab - the currently active chart tab key
+ * @param averageData - array of average price data points for the last 30 days
+ * @param latestPriceData - array of latest price data points for the last 7 days and 24 hours
+ * @returns - an array of chart points formatted for the LineChart component, containing price values, labels and closed status
+ */
 function getChartData(activeTab: ChartTabKey, averageData: StationPriceHistoryPoint[], latestPriceData: StationLatestPricePoint[]): ChartPoint[] {
     if (activeTab === 'average30') {
         return averageData.map((entry, index) => ({
