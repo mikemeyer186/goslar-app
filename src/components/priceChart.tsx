@@ -41,31 +41,82 @@ const lineConfig = {
 const chartTabs: Array<{ key: ChartTabKey; label: string; caption: string }> = [
     { key: 'latest24', label: '24 Stunden', caption: 'Preise der letzten 24 Stunden' },
     { key: 'latest7', label: '7 Tage', caption: 'Preise der letzten 7 Tage' },
-    { key: 'average30', label: '30 Tage', caption: 'Durchschnittspreise der letzten 30 Tage' },
+    { key: 'average30', label: '30 Tage', caption: 'Ø-Preise der letzten 30 Tage' },
 ];
 
 const X_AXIS_TICK_COUNT = 6;
+const LATEST_X_AXIS_TICK_COUNT = 7;
+const LATEST_24H_POINT_COUNT = 48;
+const COMPACT_X_AXIS_TICK_COUNT = 4;
+const SMALL_CHART_WIDTH = 300;
 const Y_AXIS_TICK_COUNT = 5;
+const MINUTES_PER_DAY = 24 * 60;
+const MIN_DAY_TICK_SPACING_RATIO = 0.15;
+const CLOSED_LABEL_ROTATE_WIDTH = 300;
+
+const closedRangeLabelStyle = {
+    position: 'center',
+    fill: '#6d6d6b',
+    fontSize: 11,
+    fontWeight: 600,
+} as const;
 
 function getChartValues(data: ChartPoint[]) {
     return data.flatMap((entry) => [entry.diesel, entry.e5, entry.e10]).filter((value): value is number => typeof value === 'number');
 }
 
-function getTimeTicks(data: ChartPoint[], step: number) {
-    if (data.length === 0) {
-        return [];
+function getDesiredXAxisTickCount(activeTab: ChartTabKey, chartWidth: number | null) {
+    if (chartWidth !== null && chartWidth < SMALL_CHART_WIDTH && activeTab !== 'latest7') {
+        return COMPACT_X_AXIS_TICK_COUNT;
     }
 
-    const ticks = data.map((entry) => entry.index).filter((index) => index % step === 0);
-    const lastIndex = data.length - 1;
+    return activeTab === 'average30' ? X_AXIS_TICK_COUNT : LATEST_X_AXIS_TICK_COUNT;
+}
 
-    return ticks.includes(lastIndex) ? ticks : [...ticks, lastIndex];
+function getLabelMinutes(label: string) {
+    const [hour, minute = '0'] = label.split(':');
+    const hourValue = Number(hour);
+    const minuteValue = Number(minute);
+
+    if (!Number.isFinite(hourValue) || !Number.isFinite(minuteValue)) {
+        return null;
+    }
+
+    return hourValue * 60 + minuteValue;
+}
+
+function formatHourFromMinutes(totalMinutes: number) {
+    const normalizedMinutes = Math.round(totalMinutes) % MINUTES_PER_DAY;
+    const positiveMinutes = normalizedMinutes < 0 ? normalizedMinutes + MINUTES_PER_DAY : normalizedMinutes;
+    const hour = Math.floor(positiveMinutes / 60);
+
+    return `${hour.toString().padStart(2, '0')}:00`;
+}
+
+function formatHourTick(label: string) {
+    const labelMinutes = getLabelMinutes(label);
+
+    return labelMinutes === null ? '' : formatHourFromMinutes(labelMinutes);
+}
+
+function formatLinearDayHourTick(data: ChartPoint[], value: number) {
+    if (data.length < LATEST_24H_POINT_COUNT) {
+        return formatHourTick(data[clamp(Math.round(value), 0, data.length - 1)]?.label ?? '');
+    }
+
+    const startMinutes = getLabelMinutes(data[0]?.label ?? '');
+
+    if (startMinutes === null) {
+        return '';
+    }
+
+    const progress = clamp(value, 0, data.length - 1) / (data.length - 1);
+    return formatHourFromMinutes(startMinutes + progress * MINUTES_PER_DAY);
 }
 
 function getWeekdayTicks(data: ChartPoint[]) {
     const seenDates = new Set<string>();
-
-    return data
+    const ticks = data
         .filter((entry) => {
             const dayKey = entry.tooltipLabel?.slice(0, 10) ?? entry.label;
 
@@ -77,12 +128,29 @@ function getWeekdayTicks(data: ChartPoint[]) {
             return true;
         })
         .map((entry) => entry.index);
+
+    const leadingTickSpacingRatio = ticks.length > 1 && data.length > 1 ? (ticks[1] - ticks[0]) / (data.length - 1) : null;
+
+    if (leadingTickSpacingRatio !== null && leadingTickSpacingRatio < MIN_DAY_TICK_SPACING_RATIO) {
+        return ticks.slice(1);
+    }
+
+    return ticks;
 }
 
-function formatHourTick(label: string) {
-    const [hour] = label.split(':');
+function getClosedRangeLabel(chartWidth: number | null) {
+    if (chartWidth !== null && chartWidth <= CLOSED_LABEL_ROTATE_WIDTH) {
+        return {
+            ...closedRangeLabelStyle,
+            value: 'geschlossen',
+            angle: 90,
+        };
+    }
 
-    return hour ? `${hour}:00` : '';
+    return {
+        ...closedRangeLabelStyle,
+        value: 'geschlossen',
+    };
 }
 
 function getClosedRanges(data: ChartPoint[]) {
@@ -118,7 +186,7 @@ function getChartData(activeTab: ChartTabKey, averageData: StationPriceHistoryPo
         }));
     }
 
-    const data = activeTab === 'latest24' ? latestPriceData.slice(-48) : latestPriceData.slice(-336);
+    const data = activeTab === 'latest24' ? latestPriceData.slice(-LATEST_24H_POINT_COUNT) : latestPriceData.slice(-336);
 
     return data.map((entry, index) => ({
         index,
@@ -135,6 +203,7 @@ function getChartData(activeTab: ChartTabKey, averageData: StationPriceHistoryPo
 
 export default function PriceChart({ averageData, latestPriceData }: PriceChartProps) {
     const [activeTab, setActiveTab] = useState<ChartTabKey>('latest24');
+    const [chartWidth, setChartWidth] = useState<number | null>(null);
     const activeTabConfig = chartTabs.find((tab) => tab.key === activeTab) ?? chartTabs[0];
     const chartData = getChartData(activeTab, averageData, latestPriceData);
     const maxIndex = chartData.length - 1;
@@ -142,15 +211,12 @@ export default function PriceChart({ averageData, latestPriceData }: PriceChartP
     const closedRanges = activeTab === 'latest24' ? getClosedRanges(chartData) : [];
 
     const xTicks = (() => {
-        if (activeTab === 'latest24') {
-            return getTimeTicks(chartData, 8);
-        }
-
         if (activeTab === 'latest7') {
             return getWeekdayTicks(chartData);
         }
 
-        const xTickCount = Math.min(X_AXIS_TICK_COUNT, chartData.length);
+        const desiredTickCount = getDesiredXAxisTickCount(activeTab, chartWidth);
+        const xTickCount = Math.min(desiredTickCount, chartData.length);
         return createLinearTicks(0, maxIndex, xTickCount, 6);
     })();
 
@@ -162,7 +228,7 @@ export default function PriceChart({ averageData, latestPriceData }: PriceChartP
         }
 
         if (activeTab === 'latest24') {
-            return formatHourTick(entry?.label ?? '');
+            return formatLinearDayHourTick(chartData, value);
         }
 
         return entry?.label ?? '';
@@ -178,10 +244,16 @@ export default function PriceChart({ averageData, latestPriceData }: PriceChartP
         const padding = Math.max(0.015, (maximumValue - minimumValue) * 0.2 || 0.03);
         const lowerPadding = padding + 0.01;
         const upperPadding = padding;
-        const yTicks = createLinearTicks(minimumValue - lowerPadding, maximumValue + upperPadding, Y_AXIS_TICK_COUNT, 3);
+        const yTicks = createLinearTicks(minimumValue - lowerPadding, maximumValue + upperPadding, Y_AXIS_TICK_COUNT, 6);
 
         return (
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer
+                width="100%"
+                height={220}
+                onResize={(width) => {
+                    setChartWidth((currentWidth) => (currentWidth === width ? currentWidth : width));
+                }}
+            >
                 <LineChart data={chartData} margin={{ top: 18, right: 10, bottom: 8, left: 0 }}>
                     <CartesianGrid stroke="#00000012" strokeDasharray="3 3" vertical={false} />
                     {closedRanges.map((range) => (
@@ -192,7 +264,7 @@ export default function PriceChart({ averageData, latestPriceData }: PriceChartP
                             fill="#8f8f8f"
                             fillOpacity={0.14}
                             strokeOpacity={0}
-                            label={{ value: 'geschlossen', position: 'center', fill: '#6d6d6b', fontSize: 11, fontWeight: 600 }}
+                            label={getClosedRangeLabel(chartWidth)}
                         />
                     ))}
                     <XAxis
@@ -205,6 +277,7 @@ export default function PriceChart({ averageData, latestPriceData }: PriceChartP
                         tickLine={false}
                         axisLine={false}
                         tickMargin={10}
+                        interval={0}
                         allowDecimals
                         padding={{ left: 10, right: 6 }}
                     />
@@ -215,6 +288,7 @@ export default function PriceChart({ averageData, latestPriceData }: PriceChartP
                         tick={{ fontSize: 12, fill: '#5d5d5b' }}
                         tickLine={false}
                         axisLine={false}
+                        interval={0}
                         width={60}
                     />
                     <Tooltip
