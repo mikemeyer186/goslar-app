@@ -29,13 +29,10 @@ export default function Imprint({ closeModal }: ImprintTileProps) {
 
                         <div>
                             <p>
-                                Mike Meyer
-                                <br />
-                                Claustorwall 9c
-                                <br />
-                                38640 Goslar
-                                <br />
-                                <br />
+                                Mike Meyer<br />
+                                c/o POSTFLEX PFX-072-807<br />
+                                Emsdettener Straße 10<br />
+                                48268 Greven<br />
                             </p>
                         </div>
 

@@ -1,7 +1,6 @@
 # Project-specific Codex settings
 
 model = "gpt-5.4"
-model_provider = "openai"
 personality = "pragmatic"
 
 model_reasoning_effort = "medium"

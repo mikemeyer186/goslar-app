@@ -33,10 +33,11 @@ export default function DataProtection({ closeModal }: DatProTileProps) {
                         k&ouml;nnen. Ausf&uuml;hrliche Informationen zum Thema Datenschutz entnehmen Sie unserer unter diesem Text aufgef&uuml;hrten
                         Datenschutzerkl&auml;rung.
                     </p>
-                    <h3>Datenerfassung auf dieser Website</h3> <h4>Wer ist verantwortlich f&uuml;r die Datenerfassung auf dieser Website?</h4>{' '}
+                    <h3>Datenerfassung auf dieser Website</h3> 
+                    <h4>Wer ist verantwortlich f&uuml;r die Datenerfassung auf dieser Website?</h4>{' '}
                     <p>
                         Die Datenverarbeitung auf dieser Website erfolgt durch den Websitebetreiber. Dessen Kontaktdaten k&ouml;nnen Sie dem Abschnitt
-                        &bdquo;Hinweis zur Verantwortlichen Stelle&ldquo; in dieser Datenschutzerkl&auml;rung entnehmen.
+                        &bdquo;Hinweis zur verantwortlichen Stelle&ldquo; in dieser Datenschutzerkl&auml;rung entnehmen.
                     </p>{' '}
                     <h4>Wie erfassen wir Ihre Daten?</h4>{' '}
                     <p>
@@ -130,11 +131,10 @@ export default function DataProtection({ closeModal }: DatProTileProps) {
                     <h3>Hinweis zur verantwortlichen Stelle</h3>{' '}
                     <p>Die verantwortliche Stelle f&uuml;r die Datenverarbeitung auf dieser Website ist:</p>{' '}
                     <p>
-                        Mike Meyer
-                        <br />
-                        Claustorwall 9c
-                        <br />
-                        38640 Goslar
+                        Mike Meyer<br />
+                        c/o POSTFLEX PFX-072-807<br />
+                        Emsdettener Straße 10<br />
+                        48268 Greven<br />
                     </p>
                     <p>
                         Telefon: +49 (0) 151 255 267 04
@@ -164,7 +164,7 @@ export default function DataProtection({ closeModal }: DatProTileProps) {
                         erfolgt die Datenverarbeitung zus&auml;tzlich auf Grundlage von &sect; 25 Abs. 1 TDDDG. Die Einwilligung ist jederzeit
                         widerrufbar. Sind Ihre Daten zur Vertragserf&uuml;llung oder zur Durchf&uuml;hrung vorvertraglicher Ma&szlig;nahmen
                         erforderlich, verarbeiten wir Ihre Daten auf Grundlage des Art. 6 Abs. 1 lit. b DSGVO. Des Weiteren verarbeiten wir Ihre
-                        Daten, sofern diese zur Erf&uuml;llung einer rechtlichen Verpflichtung erforderlich sind auf Grundlage von Art. 6 Abs. 1 lit.
+                        Daten, sofern diese zur Erf&uuml;llung einer rechtlichen Verpflichtung erforderlich sind, auf Grundlage von Art. 6 Abs. 1 lit.
                         c DSGVO. Die Datenverarbeitung kann ferner auf Grundlage unseres berechtigten Interesses nach Art. 6 Abs. 1 lit. f DSGVO
                         erfolgen. &Uuml;ber die jeweils im Einzelfall einschl&auml;gigen Rechtsgrundlagen wird in den folgenden Abs&auml;tzen dieser
                         Datenschutzerkl&auml;rung informiert.
@@ -305,7 +305,8 @@ export default function DataProtection({ closeModal }: DatProTileProps) {
                         Funktionalit&auml;t dieser Website eingeschr&auml;nkt sein.
                     </p>{' '}
                     <p>
-                        Welche Cookies und Dienste auf dieser Website eingesetzt werden, k&ouml;nnen Sie dieser Datenschutzerkl&auml;rung entnehmen.
+                        Sofern weitere Cookies und Dienste auf dieser Website eingesetzt werden, k&ouml;nnen Sie dies dieser Datenschutzerkl&auml;rung
+                        entnehmen.
                     </p>
                     <h3>Einwilligung mit Usercentrics</h3>{' '}
                     <p>
@@ -354,8 +355,12 @@ export default function DataProtection({ closeModal }: DatProTileProps) {
                     </p>{' '}
                     <ul>
                         {' '}
-                        <li>Browsertyp und Browserversion</li> <li>verwendetes Betriebssystem</li> <li>Referrer URL</li>{' '}
-                        <li>Hostname des zugreifenden Rechners</li> <li>Uhrzeit der Serveranfrage</li> <li>IP-Adresse</li>{' '}
+                        <li>Browsertyp und Browserversion</li> 
+                        <li>verwendetes Betriebssystem</li> 
+                        <li>Referrer URL</li>
+                        <li>Hostname des zugreifenden Rechners</li> 
+                        <li>Uhrzeit der Serveranfrage</li> 
+                        <li>IP-Adresse</li>
                     </ul>{' '}
                     <p>Eine Zusammenf&uuml;hrung dieser Daten mit anderen Datenquellen wird nicht vorgenommen.</p>{' '}
                     <p>
